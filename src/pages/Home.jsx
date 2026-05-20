@@ -2,45 +2,44 @@ import { useNavigate } from "react-router-dom";
 
 import officials1 from "../assets/officials1.png";
 import barangayseal from "../assets/barangayseal.png";
-import clearanceIcon from "../assets/clearance.png";
 import reportsIcon from "../assets/reports.png";
 import announcementIcon from "../assets/announcement.png";
 import ucabai from "../assets/ucab-ai.png";
 
 export default function Home() {
+
   const navigate = useNavigate();
 
   const services = [
-    {
-      title: "Barangay Clearance",
-      description: "Request barangay documents and certificates online.",
-      image: clearanceIcon,
-      action: () => navigate("/reports"),
-    },
 
     {
       title: "Community Reports",
-      description: "Report concerns and incidents in your area.",
+      description:
+        "Report community concerns and track barangay responses in real time.",
       image: reportsIcon,
       action: () => navigate("/reports"),
     },
 
     {
       title: "Barangay AI",
-      description: "AI-powered assistant for residents.",
+      description:
+        "AI-powered assistant for Barangay Ucab residents.",
       image: ucabai,
       action: () => navigate("/chatbot"),
     },
 
     {
       title: "News & Updates",
-      description: "Latest barangay news and updates.",
+      description:
+        "Latest barangay announcements and updates.",
       image: announcementIcon,
       action: () => navigate("/community"),
     },
+
   ];
 
   return (
+
     <div
       style={{
         backgroundColor: "#f5f7f5",
@@ -48,7 +47,9 @@ export default function Home() {
         fontFamily: "Arial",
       }}
     >
+
       {/* HERO SECTION */}
+
       <div
         style={{
           position: "relative",
@@ -57,7 +58,9 @@ export default function Home() {
           color: "white",
         }}
       >
+
         {/* VIDEO BACKGROUND */}
+
         <video
           autoPlay
           muted
@@ -73,10 +76,16 @@ export default function Home() {
             zIndex: 0,
           }}
         >
-          <source src="/videos/ucab.mp4" type="video/mp4" />
+
+          <source
+            src="/videos/ucab.mp4"
+            type="video/mp4"
+          />
+
         </video>
 
         {/* DARK OVERLAY */}
+
         <div
           style={{
             position: "absolute",
@@ -88,6 +97,7 @@ export default function Home() {
         />
 
         {/* HERO CONTENT */}
+
         <div
           style={{
             position: "relative",
@@ -100,13 +110,16 @@ export default function Home() {
             padding: "0 20px",
           }}
         >
+
           <div>
+
             <h1
               style={{
                 fontSize: "85px",
                 marginBottom: "20px",
                 fontWeight: "bold",
-                textShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                textShadow:
+                  "0 4px 12px rgba(0,0,0,0.5)",
               }}
             >
               Idamag.mo
@@ -118,12 +131,17 @@ export default function Home() {
                 lineHeight: "1.7",
                 marginBottom: "35px",
                 maxWidth: "700px",
-                textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+                textShadow:
+                  "0 2px 8px rgba(0,0,0,0.5)",
               }}
             >
-              Smart Barangay Information System with AI Assistance for
-              Barangay Ucab, Itogon, Benguet.
+              Smart Barangay Information
+              System with AI Assistance
+              for Barangay Ucab,
+              Itogon, Benguet.
             </p>
+
+            {/* BUTTONS */}
 
             <div
               style={{
@@ -132,65 +150,108 @@ export default function Home() {
                 flexWrap: "wrap",
               }}
             >
+
               {/* EXPLORE SERVICES */}
+
               <button
-                onClick={() => navigate("/reports")}
+                onClick={() => {
+
+                  document
+                    .getElementById(
+                      "services"
+                    )
+                    ?.scrollIntoView({
+                      behavior:
+                        "smooth"
+                    });
+
+                }}
                 style={{
-                  backgroundColor: "white",
-                  color: "#1B5E20",
+                  backgroundColor:
+                    "white",
+                  color:
+                    "#1B5E20",
                   border: "none",
-                  padding: "16px 30px",
-                  borderRadius: "15px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                  padding:
+                    "16px 30px",
+                  borderRadius:
+                    "15px",
+                  cursor:
+                    "pointer",
+                  fontWeight:
+                    "bold",
+                  fontSize:
+                    "16px",
+                  boxShadow:
+                    "0 4px 10px rgba(0,0,0,0.3)",
                 }}
               >
                 Explore Services
               </button>
 
               {/* COMMUNITY FEED */}
+
               <button
-                onClick={() => navigate("/community")}
+                onClick={() =>
+                  navigate(
+                    "/community"
+                  )
+                }
                 style={{
-                  backgroundColor: "transparent",
+                  backgroundColor:
+                    "transparent",
                   color: "white",
-                  border: "2px solid white",
-                  padding: "16px 30px",
-                  borderRadius: "15px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  backdropFilter: "blur(5px)",
+                  border:
+                    "2px solid white",
+                  padding:
+                    "16px 30px",
+                  borderRadius:
+                    "15px",
+                  cursor:
+                    "pointer",
+                  fontWeight:
+                    "bold",
+                  fontSize:
+                    "16px",
+                  backdropFilter:
+                    "blur(5px)",
                 }}
               >
                 Community Feed
               </button>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
 
       {/* DIGITAL SERVICES */}
+
       <div
+        id="services"
         style={{
           padding: "90px 20px",
           backgroundColor: "#f5f7f5",
         }}
       >
+
         <div
           style={{
             maxWidth: "1400px",
             margin: "0 auto",
           }}
         >
+
           <div
             style={{
               textAlign: "center",
               marginBottom: "60px",
             }}
           >
+
             <h2
               style={{
                 fontSize: "65px",
@@ -207,95 +268,148 @@ export default function Home() {
                 color: "#555",
               }}
             >
-              Online services and resources for Barangay Ucab residents.
+              Online services and
+              resources for Barangay
+              Ucab residents.
             </p>
+
           </div>
 
           {/* SERVICE CARDS */}
+
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit,minmax(340px,1fr))",
               gap: "35px",
             }}
           >
-            {services.map((service, index) => (
-              <div
-                key={index}
-                onClick={service.action}
-                style={{
-                  backgroundColor: "white",
-                  borderRadius: "30px",
-                  padding: "40px",
-                  cursor: "pointer",
-                  transition: "0.3s",
-                  boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
-                  textAlign: "center",
-                }}
-              >
+
+            {services.map(
+              (service, index) => (
+
                 <div
+                  key={index}
+                  onClick={
+                    service.action
+                  }
                   style={{
-                    width: "140px",
-                    height: "140px",
-                    margin: "0 auto 25px auto",
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    backgroundColor: "#edf7ed",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    backgroundColor:
+                      "white",
+                    borderRadius:
+                      "30px",
+                    padding: "40px",
+                    cursor:
+                      "pointer",
+                    transition:
+                      "0.3s",
+                    boxShadow:
+                      "0 8px 25px rgba(0,0,0,0.08)",
+                    textAlign:
+                      "center",
                   }}
                 >
-                  <img
-                    src={service.image}
-                    alt={service.title}
+
+                  <div
                     style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
+                      width: "140px",
+                      height:
+                        "140px",
+                      margin:
+                        "0 auto 25px auto",
+                      borderRadius:
+                        "50%",
+                      overflow:
+                        "hidden",
+                      backgroundColor:
+                        "#edf7ed",
+                      display:
+                        "flex",
+                      alignItems:
+                        "center",
+                      justifyContent:
+                        "center",
                     }}
-                  />
+                  >
+
+                    <img
+                      src={
+                        service.image
+                      }
+                      alt={
+                        service.title
+                      }
+                      style={{
+                        width:
+                          "100%",
+                        height:
+                          "100%",
+                        objectFit:
+                          "cover",
+                      }}
+                    />
+
+                  </div>
+
+                  <h3
+                    style={{
+                      fontSize:
+                        "30px",
+                      color:
+                        "#1B5E20",
+                      marginBottom:
+                        "15px",
+                    }}
+                  >
+                    {service.title}
+                  </h3>
+
+                  <p
+                    style={{
+                      fontSize:
+                        "20px",
+                      lineHeight:
+                        "1.7",
+                      color:
+                        "#444",
+                    }}
+                  >
+                    {
+                      service.description
+                    }
+                  </p>
+
                 </div>
 
-                <h3
-                  style={{
-                    fontSize: "30px",
-                    color: "#1B5E20",
-                    marginBottom: "15px",
-                  }}
-                >
-                  {service.title}
-                </h3>
+              )
+            )}
 
-                <p
-                  style={{
-                    fontSize: "20px",
-                    lineHeight: "1.7",
-                    color: "#444",
-                  }}
-                >
-                  {service.description}
-                </p>
-              </div>
-            ))}
           </div>
+
         </div>
+
       </div>
 
       {/* OFFICIALS */}
+
       <div
         style={{
-          background: "linear-gradient(135deg,#1B5E20,#2E7D32)",
-          padding: "90px 20px",
+          background:
+            "linear-gradient(135deg,#1B5E20,#2E7D32)",
+          padding:
+            "90px 20px",
           color: "white",
         }}
       >
+
         <div
           style={{
             maxWidth: "1400px",
             margin: "0 auto",
           }}
         >
+
           <h2
             style={{
               fontSize: "55px",
@@ -311,32 +425,41 @@ export default function Home() {
             alt="Officials"
             style={{
               width: "100%",
-              borderRadius: "30px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+              borderRadius:
+                "30px",
+              boxShadow:
+                "0 10px 30px rgba(0,0,0,0.3)",
             }}
           />
+
         </div>
+
       </div>
 
       {/* FOOTER */}
+
       <div
         style={{
-          backgroundColor: "#111",
+          backgroundColor:
+            "#111",
           color: "white",
           padding: "50px 20px",
         }}
       >
+
         <div
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent:
+              "center",
             gap: "20px",
             flexWrap: "wrap",
           }}
         >
+
           <img
             src={barangayseal}
             alt="Barangay Seal"
@@ -344,20 +467,35 @@ export default function Home() {
               width: "70px",
               height: "70px",
               borderRadius: "50%",
-              backgroundColor: "white",
+              backgroundColor:
+                "white",
               padding: "4px",
             }}
           />
 
           <div>
-            <h2>Idamag.mo</h2>
 
-            <p style={{ color: "#aaa" }}>
-              Official Digital Platform of Barangay Ucab, Itogon, Benguet.
+            <h2>
+              Idamag.mo
+            </h2>
+
+            <p
+              style={{
+                color: "#aaa"
+              }}
+            >
+              Official Digital Platform
+              of Barangay Ucab,
+              Itogon, Benguet.
             </p>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
   );
 }
