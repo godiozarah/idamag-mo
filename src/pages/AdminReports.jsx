@@ -5,36 +5,80 @@ import {
 
 import {
   collection,
+  addDoc,
   onSnapshot,
-  updateDoc,
+  serverTimestamp,
+  deleteDoc,
   doc
 } from "firebase/firestore";
 
-import { db } from "../firebase";
+import {
+  auth,
+  db
+} from "../firebase";
 
-export default function AdminReports() {
+export default function Reports() {
+
+  const [category, setCategory] =
+    useState("");
+
+  const [details, setDetails] =
+    useState("");
 
   const [reports, setReports] =
     useState([]);
 
-  const [solutions, setSolutions] =
-    useState({});
+  // DELETE MODAL STATES
+  const [
+    showDeleteModal,
+    setShowDeleteModal
+  ] = useState(false);
+
+  const [
+    selectedReportId,
+    setSelectedReportId
+  ] = useState(null);
+
+  // ADMIN EMAIL
+  const adminEmail =
+    "admin@ucab.com";
 
   // LOAD REPORTS
   useEffect(() => {
+
+    const user =
+      auth.currentUser;
+
+    if (!user) return;
 
     const unsubscribe =
       onSnapshot(
         collection(db, "reports"),
         (snapshot) => {
 
-          const reportList =
-            snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data()
-            }));
+          const allReports =
+            snapshot.docs.map(
+              (doc) => ({
+                id: doc.id,
+                ...doc.data()
+              })
+            );
 
-          setReports(reportList);
+          const isAdmin =
+            user.email ===
+            adminEmail;
+
+          setReports(
+
+            isAdmin
+              ? allReports
+              : allReports.filter(
+                  (report) =>
+                    report.userId ===
+                    user.uid
+                )
+
+          );
         }
       );
 
@@ -42,25 +86,75 @@ export default function AdminReports() {
 
   }, []);
 
-  // UPDATE REPORT
-  const updateReport = async (
-    reportId,
-    status
-  ) => {
+  // SUBMIT REPORT
+  const submitReport = async () => {
+
+    if (
+      category.trim() === "" ||
+      details.trim() === ""
+    ) {
+
+      return;
+    }
+
+    const user =
+      auth.currentUser;
+
+    if (!user) return;
 
     try {
 
-      const reportRef =
-        doc(db, "reports", reportId);
+      await addDoc(
+        collection(db, "reports"),
+        {
+          reporterEmail:
+            user.email,
 
-      await updateDoc(reportRef, {
+          userId:
+            user.uid,
 
-        status: status,
+          category:
+            category,
 
-        adminSolution:
-          solutions[reportId] ||
-          "No response provided yet."
-      });
+          concern:
+            details,
+
+          status:
+            "Pending",
+
+          adminSolution:
+            "",
+
+          createdAt:
+            serverTimestamp()
+        }
+      );
+
+      setCategory("");
+      setDetails("");
+
+    } catch (error) {
+
+      console.error(error);
+    }
+  };
+
+  // DELETE REPORT
+  const deleteReport = async () => {
+
+    try {
+
+      await deleteDoc(
+        doc(
+          db,
+          "reports",
+          selectedReportId
+        )
+      );
+
+      setShowDeleteModal(
+        false
+      );
 
     } catch (error) {
 
@@ -92,12 +186,12 @@ export default function AdminReports() {
         <h1
           style={{
             color: "#1B5E20",
-            fontSize: "38px",
+            fontSize: "42px",
             marginBottom: "10px",
             fontWeight: "700"
           }}
         >
-          Report Management
+          Resident Reports
         </h1>
 
         <p
@@ -106,291 +200,499 @@ export default function AdminReports() {
             fontSize: "16px"
           }}
         >
-          Barangay Ucab Resident Reports
+          Submit concerns and
+          track barangay responses.
         </p>
 
       </div>
 
-      {/* REPORTS */}
+      {/* REPORT FORM */}
 
-      {reports.length === 0 && (
+      <div
+        style={{
+          backgroundColor:
+            "white",
+          padding: "30px",
+          borderRadius: "25px",
+          marginBottom: "35px",
+          boxShadow:
+            "0 8px 20px rgba(0,0,0,0.08)"
+        }}
+      >
 
-        <div
+        <h2
           style={{
-            backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "20px",
-            textAlign: "center",
-            boxShadow:
-              "0 8px 20px rgba(0,0,0,0.08)"
+            color: "#1B5E20",
+            marginBottom: "25px"
+          }}
+        >
+          Submit New Report
+        </h2>
+
+        {/* CATEGORY */}
+
+        <select
+          value={category}
+          onChange={(e) =>
+            setCategory(
+              e.target.value
+            )
+          }
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius:
+              "15px",
+            border:
+              "1px solid #ccc",
+            marginBottom:
+              "20px",
+            fontSize: "15px"
           }}
         >
 
-          <h2
-            style={{
-              color: "#1B5E20"
-            }}
-          >
-            No reports available.
-          </h2>
+          <option value="">
+            Select Concern Type
+          </option>
 
-        </div>
+          <option value="Garbage">
+            Garbage
+          </option>
 
-      )}
+          <option value="Road Damage">
+            Road Damage
+          </option>
 
-      {reports.map((report) => (
+          <option value="Noise Complaint">
+            Noise Complaint
+          </option>
 
-        <div
-          key={report.id}
+          <option value="Water Problem">
+            Water Problem
+          </option>
+
+          <option value="Emergency">
+            Emergency
+          </option>
+
+          <option value="Others">
+            Others
+          </option>
+
+        </select>
+
+        {/* DETAILS */}
+
+        <textarea
+          placeholder="Explain your concern in detail..."
+          value={details}
+          onChange={(e) =>
+            setDetails(
+              e.target.value
+            )
+          }
           style={{
-            backgroundColor: "white",
-            borderRadius: "25px",
-            padding: "30px",
-            marginBottom: "25px",
-            boxShadow:
-              "0 8px 20px rgba(0,0,0,0.08)"
+            width: "100%",
+            height: "150px",
+            padding: "18px",
+            borderRadius:
+              "15px",
+            border:
+              "1px solid #ccc",
+            marginBottom:
+              "20px",
+            resize: "none",
+            fontSize: "15px"
+          }}
+        />
+
+        {/* SUBMIT */}
+
+        <button
+          onClick={
+            submitReport
+          }
+          style={{
+            background:
+              "linear-gradient(90deg,#1B5E20,#43A047)",
+            color: "white",
+            border: "none",
+            padding:
+              "14px 28px",
+            borderRadius:
+              "14px",
+            cursor: "pointer",
+            fontWeight: "600"
           }}
         >
+          Submit Report
+        </button>
 
-          {/* REPORT HEADER */}
+      </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              alignItems: "center",
-              marginBottom: "25px",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}
-          >
+      {/* REPORT LIST */}
 
-            <div>
+      <div>
 
-              <h2
-                style={{
-                  color: "#1B5E20",
-                  marginBottom: "8px"
-                }}
-              >
-                Resident Report
-              </h2>
+        <h2
+          style={{
+            color: "#1B5E20",
+            marginBottom: "25px"
+          }}
+        >
+          Submitted Reports
+        </h2>
 
-              <p
-                style={{
-                  color: "#666",
-                  margin: 0
-                }}
-              >
-                {report.reporterEmail}
-              </p>
-
-            </div>
-
-            <div
-              style={{
-                backgroundColor:
-                  report.status ===
-                  "Resolved"
-                    ? "#E8F5E9"
-                    : "#FFF8E1",
-                color:
-                  report.status ===
-                  "Resolved"
-                    ? "#2E7D32"
-                    : "#F57F17",
-                padding:
-                  "10px 18px",
-                borderRadius: "30px",
-                fontWeight: "600",
-                fontSize: "14px"
-              }}
-            >
-              {report.status || "Pending"}
-            </div>
-
-          </div>
-
-          {/* CONCERN */}
+        {reports.length === 0 && (
 
           <div
             style={{
-              marginBottom: "25px"
+              backgroundColor:
+                "white",
+              padding: "30px",
+              borderRadius:
+                "25px",
+              textAlign:
+                "center"
             }}
           >
 
             <h3
               style={{
-                color: "#1B5E20",
-                marginBottom: "10px"
+                color:
+                  "#1B5E20"
               }}
             >
-              Concern
+              No reports available.
             </h3>
+
+          </div>
+
+        )}
+
+        {reports.map((report) => (
+
+          <div
+            key={report.id}
+            style={{
+              backgroundColor:
+                "white",
+              padding: "30px",
+              borderRadius:
+                "25px",
+              marginBottom:
+                "25px",
+              boxShadow:
+                "0 8px 20px rgba(0,0,0,0.08)"
+            }}
+          >
+
+            {/* HEADER */}
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent:
+                  "space-between",
+                alignItems:
+                  "center",
+                marginBottom:
+                  "20px",
+                flexWrap:
+                  "wrap",
+                gap: "10px"
+              }}
+            >
+
+              <h2
+                style={{
+                  color:
+                    "#1B5E20",
+                  margin: 0
+                }}
+              >
+                {report.category}
+              </h2>
+
+              <div
+                style={{
+                  backgroundColor:
+                    report.status ===
+                    "Resolved"
+                      ? "#E8F5E9"
+                      : "#FFF8E1",
+
+                  color:
+                    report.status ===
+                    "Resolved"
+                      ? "#2E7D32"
+                      : "#F57F17",
+
+                  padding:
+                    "10px 18px",
+
+                  borderRadius:
+                    "30px",
+
+                  fontWeight:
+                    "600"
+                }}
+              >
+                {report.status}
+              </div>
+
+            </div>
+
+            {/* REPORTER */}
+
+            <p
+              style={{
+                color: "#777",
+                marginBottom:
+                  "15px"
+              }}
+            >
+              Reporter:
+              {" "}
+              {report.reporterEmail}
+            </p>
+
+            {/* CONCERN */}
 
             <div
               style={{
                 backgroundColor:
                   "#f8f8f8",
-                padding: "18px",
-                borderRadius: "15px",
-                lineHeight: "1.7",
-                color: "#333"
-              }}
-            >
-              {report.concern}
-            </div>
-
-          </div>
-
-          {/* CURRENT RESPONSE */}
-
-          {report.adminSolution && (
-
-            <div
-              style={{
-                marginBottom: "25px"
+                padding: "20px",
+                borderRadius:
+                  "18px",
+                marginBottom:
+                  "20px"
               }}
             >
 
-              <h3
+              <p
                 style={{
-                  color: "#1B5E20",
-                  marginBottom: "10px"
+                  lineHeight:
+                    "1.8",
+                  margin: 0
                 }}
               >
-                Current Response
-              </h3>
+                {report.concern}
+              </p>
+
+            </div>
+
+            {/* ADMIN DELETE */}
+
+            {auth.currentUser
+              ?.email ===
+              adminEmail && (
+
+              <button
+                onClick={() => {
+
+                  setSelectedReportId(
+                    report.id
+                  );
+
+                  setShowDeleteModal(
+                    true
+                  );
+
+                }}
+                style={{
+                  backgroundColor:
+                    "#d32f2f",
+                  color:
+                    "white",
+                  border:
+                    "none",
+                  padding:
+                    "12px 20px",
+                  borderRadius:
+                    "12px",
+                  cursor:
+                    "pointer",
+                  marginBottom:
+                    "20px",
+                  fontWeight:
+                    "600"
+                }}
+              >
+                Delete Report
+              </button>
+
+            )}
+
+            {/* RESPONSE */}
+
+            {report.adminSolution && (
 
               <div
                 style={{
                   backgroundColor:
                     "#E8F5E9",
-                  padding: "18px",
-                  borderRadius: "15px",
-                  lineHeight: "1.7",
-                  color: "#1B5E20"
+                  padding: "20px",
+                  borderRadius:
+                    "18px"
                 }}
               >
-                {report.adminSolution}
+
+                <h3
+                  style={{
+                    color:
+                      "#1B5E20"
+                  }}
+                >
+                  Barangay Response
+                </h3>
+
+                <p>
+                  {report.adminSolution}
+                </p>
+
               </div>
 
-            </div>
-
-          )}
-
-          {/* RESPONSE INPUT */}
-
-          <div
-            style={{
-              marginBottom: "25px"
-            }}
-          >
-
-            <h3
-              style={{
-                color: "#1B5E20",
-                marginBottom: "10px"
-              }}
-            >
-              Write Response
-            </h3>
-
-            <textarea
-              placeholder="Write your response or solution here..."
-              value={
-                solutions[report.id] || ""
-              }
-              onChange={(e) =>
-                setSolutions({
-                  ...solutions,
-                  [report.id]:
-                    e.target.value
-                })
-              }
-              style={{
-                width: "100%",
-                height: "120px",
-                padding: "15px",
-                borderRadius: "15px",
-                border:
-                  "1px solid #ccc",
-                outline: "none",
-                resize: "none",
-                fontSize: "15px",
-                fontFamily:
-                  "'Segoe UI', sans-serif"
-              }}
-            />
+            )}
 
           </div>
 
-          {/* BUTTONS */}
+        ))}
+
+      </div>
+
+      {/* DELETE MODAL */}
+
+      {showDeleteModal && (
+
+        <div
+          style={{
+            position:
+              "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor:
+              "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent:
+              "center",
+            alignItems:
+              "center",
+            zIndex: 9999
+          }}
+        >
 
           <div
             style={{
-              display: "flex",
-              gap: "15px",
-              flexWrap: "wrap"
+              backgroundColor:
+                "white",
+              padding: "35px",
+              borderRadius:
+                "25px",
+              width: "400px",
+              textAlign:
+                "center",
+              boxShadow:
+                "0 10px 30px rgba(0,0,0,0.2)"
             }}
           >
 
-            {/* PENDING */}
-
-            <button
-              onClick={() =>
-                updateReport(
-                  report.id,
-                  "Pending"
-                )
-              }
+            <h2
               style={{
-                padding:
-                  "14px 25px",
-                backgroundColor:
-                  "#FFF8E1",
-                color: "#F57F17",
-                border: "none",
-                borderRadius: "12px",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "0.3s"
+                color:
+                  "#1B5E20",
+                marginBottom:
+                  "15px"
               }}
             >
-              Set Pending
-            </button>
+              Delete Report
+            </h2>
 
-            {/* RESOLVED */}
-
-            <button
-              onClick={() =>
-                updateReport(
-                  report.id,
-                  "Resolved"
-                )
-              }
+            <p
               style={{
-                padding:
-                  "14px 25px",
-                background:
-                  "linear-gradient(90deg,#1B5E20,#43A047)",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "0.3s"
+                color: "#555",
+                marginBottom:
+                  "30px",
+                lineHeight:
+                  "1.7"
               }}
             >
-              Resolve & Send
-            </button>
+              Are you sure you
+              want to permanently
+              delete this report?
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent:
+                  "center",
+                gap: "15px"
+              }}
+            >
+
+              {/* CANCEL */}
+
+              <button
+                onClick={() =>
+                  setShowDeleteModal(
+                    false
+                  )
+                }
+                style={{
+                  padding:
+                    "12px 20px",
+                  borderRadius:
+                    "12px",
+                  border:
+                    "1px solid #ccc",
+                  backgroundColor:
+                    "white",
+                  cursor:
+                    "pointer",
+                  fontWeight:
+                    "600"
+                }}
+              >
+                Cancel
+              </button>
+
+              {/* DELETE */}
+
+              <button
+                onClick={
+                  deleteReport
+                }
+                style={{
+                  padding:
+                    "12px 20px",
+                  borderRadius:
+                    "12px",
+                  border:
+                    "none",
+                  backgroundColor:
+                    "#d32f2f",
+                  color:
+                    "white",
+                  cursor:
+                    "pointer",
+                  fontWeight:
+                    "600"
+                }}
+              >
+                Delete
+              </button>
+
+            </div>
 
           </div>
 
         </div>
 
-      ))}
+      )}
 
     </div>
   );

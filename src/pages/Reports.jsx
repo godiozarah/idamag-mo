@@ -7,7 +7,9 @@ import {
   collection,
   addDoc,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  deleteDoc,
+  doc
 } from "firebase/firestore";
 
 import {
@@ -26,7 +28,11 @@ export default function Reports() {
   const [reports, setReports] =
     useState([]);
 
-  // LOAD USER REPORTS
+  // ADMIN EMAIL
+  const adminEmail =
+    "admin@ucab.com";
+
+  // LOAD REPORTS
   useEffect(() => {
 
     const user = auth.currentUser;
@@ -38,18 +44,26 @@ export default function Reports() {
         collection(db, "reports"),
         (snapshot) => {
 
-          const reportList =
-            snapshot.docs
-              .map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-              }))
-              .filter(
-                (report) =>
-                  report.userId === user.uid
-              );
+          const allReports =
+            snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data()
+            }));
 
-          setReports(reportList);
+          const isAdmin =
+            user.email === adminEmail;
+
+          setReports(
+
+            isAdmin
+              ? allReports
+              : allReports.filter(
+                  (report) =>
+                    report.userId ===
+                    user.uid
+                )
+
+          );
         }
       );
 
@@ -77,19 +91,26 @@ export default function Reports() {
       await addDoc(
         collection(db, "reports"),
         {
-          reporterEmail: user.email,
+          reporterEmail:
+            user.email,
 
-          userId: user.uid,
+          userId:
+            user.uid,
 
-          category: category,
+          category:
+            category,
 
-          concern: details,
+          concern:
+            details,
 
-          status: "Pending",
+          status:
+            "Pending",
 
-          adminSolution: "",
+          adminSolution:
+            "",
 
-          createdAt: serverTimestamp()
+          createdAt:
+            serverTimestamp()
         }
       );
 
@@ -99,6 +120,38 @@ export default function Reports() {
     } catch (error) {
 
       console.error(error);
+    }
+  };
+
+  // DELETE REPORT
+  const deleteReport = async (
+    reportId
+  ) => {
+
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete this report?"
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await deleteDoc(
+        doc(db, "reports", reportId)
+      );
+
+      alert(
+        "Report deleted successfully."
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Failed to delete report."
+      );
     }
   };
 
@@ -169,112 +222,76 @@ export default function Reports() {
 
         {/* CATEGORY */}
 
-        <div
+        <select
+          value={category}
+          onChange={(e) =>
+            setCategory(
+              e.target.value
+            )
+          }
           style={{
-            marginBottom: "20px"
+            width: "100%",
+            padding: "15px",
+            borderRadius: "15px",
+            border:
+              "1px solid #ccc",
+            marginBottom: "20px",
+            fontSize: "15px"
           }}
         >
 
-          <label
-            style={{
-              display: "block",
-              marginBottom: "10px",
-              color: "#1B5E20",
-              fontWeight: "600"
-            }}
-          >
-            Concern Category
-          </label>
+          <option value="">
+            Select Concern Type
+          </option>
 
-          <select
-            value={category}
-            onChange={(e) =>
-              setCategory(e.target.value)
-            }
-            style={{
-              width: "100%",
-              padding: "15px",
-              borderRadius: "15px",
-              border:
-                "1px solid #ccc",
-              fontSize: "15px",
-              outline: "none"
-            }}
-          >
+          <option value="Garbage">
+            Garbage
+          </option>
 
-            <option value="">
-              Select Concern Type
-            </option>
+          <option value="Road Damage">
+            Road Damage
+          </option>
 
-            <option value="Garbage">
-              Garbage
-            </option>
+          <option value="Noise Complaint">
+            Noise Complaint
+          </option>
 
-            <option value="Road Damage">
-              Road Damage
-            </option>
+          <option value="Water Problem">
+            Water Problem
+          </option>
 
-            <option value="Noise Complaint">
-              Noise Complaint
-            </option>
+          <option value="Emergency">
+            Emergency
+          </option>
 
-            <option value="Water Problem">
-              Water Problem
-            </option>
+          <option value="Others">
+            Others
+          </option>
 
-            <option value="Emergency">
-              Emergency
-            </option>
-
-            <option value="Others">
-              Others
-            </option>
-
-          </select>
-
-        </div>
+        </select>
 
         {/* DETAILS */}
 
-        <div
+        <textarea
+          placeholder="Explain your concern in detail..."
+          value={details}
+          onChange={(e) =>
+            setDetails(
+              e.target.value
+            )
+          }
           style={{
-            marginBottom: "25px"
+            width: "100%",
+            height: "150px",
+            padding: "18px",
+            borderRadius: "15px",
+            border:
+              "1px solid #ccc",
+            marginBottom: "20px",
+            resize: "none",
+            fontSize: "15px"
           }}
-        >
-
-          <label
-            style={{
-              display: "block",
-              marginBottom: "10px",
-              color: "#1B5E20",
-              fontWeight: "600"
-            }}
-          >
-            Concern Details
-          </label>
-
-          <textarea
-            placeholder="Explain your concern in detail..."
-            value={details}
-            onChange={(e) =>
-              setDetails(e.target.value)
-            }
-            style={{
-              width: "100%",
-              height: "150px",
-              padding: "18px",
-              borderRadius: "15px",
-              border:
-                "1px solid #ccc",
-              fontSize: "15px",
-              outline: "none",
-              resize: "none",
-              fontFamily:
-                "'Segoe UI', sans-serif"
-            }}
-          />
-
-        </div>
+        />
 
         {/* SUBMIT */}
 
@@ -288,8 +305,7 @@ export default function Reports() {
             padding: "14px 28px",
             borderRadius: "14px",
             cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "15px"
+            fontWeight: "600"
           }}
         >
           Submit Report
@@ -299,11 +315,7 @@ export default function Reports() {
 
       {/* REPORT LIST */}
 
-      <div
-        style={{
-          marginTop: "30px"
-        }}
-      >
+      <div>
 
         <h2
           style={{
@@ -311,19 +323,18 @@ export default function Reports() {
             marginBottom: "25px"
           }}
         >
-          My Submitted Reports
+          Submitted Reports
         </h2>
 
         {reports.length === 0 && (
 
           <div
             style={{
-              backgroundColor: "white",
+              backgroundColor:
+                "white",
               padding: "30px",
               borderRadius: "25px",
-              textAlign: "center",
-              boxShadow:
-                "0 8px 20px rgba(0,0,0,0.08)"
+              textAlign: "center"
             }}
           >
 
@@ -332,7 +343,7 @@ export default function Reports() {
                 color: "#1B5E20"
               }}
             >
-              No reports submitted yet.
+              No reports available.
             </h3>
 
           </div>
@@ -344,7 +355,8 @@ export default function Reports() {
           <div
             key={report.id}
             style={{
-              backgroundColor: "white",
+              backgroundColor:
+                "white",
               padding: "30px",
               borderRadius: "25px",
               marginBottom: "25px",
@@ -396,15 +408,26 @@ export default function Reports() {
                   borderRadius:
                     "30px",
 
-                  fontWeight: "600",
-
-                  fontSize: "14px"
+                  fontWeight: "600"
                 }}
               >
                 {report.status}
               </div>
 
             </div>
+
+            {/* REPORTER */}
+
+            <p
+              style={{
+                color: "#777",
+                marginBottom: "15px"
+              }}
+            >
+              Reporter:
+              {" "}
+              {report.reporterEmail}
+            </p>
 
             {/* CONCERN */}
 
@@ -420,9 +443,7 @@ export default function Reports() {
 
               <p
                 style={{
-                  fontSize: "16px",
                   lineHeight: "1.8",
-                  color: "#333",
                   margin: 0
                 }}
               >
@@ -430,6 +451,37 @@ export default function Reports() {
               </p>
 
             </div>
+
+            {/* ADMIN DELETE */}
+
+            {auth.currentUser?.email ===
+              adminEmail && (
+
+              <button
+                onClick={() =>
+                  deleteReport(
+                    report.id
+                  )
+                }
+                style={{
+                  backgroundColor:
+                    "#d32f2f",
+                  color: "white",
+                  border: "none",
+                  padding:
+                    "12px 20px",
+                  borderRadius:
+                    "12px",
+                  cursor: "pointer",
+                  marginBottom:
+                    "20px",
+                  fontWeight: "600"
+                }}
+              >
+                Delete Report
+              </button>
+
+            )}
 
             {/* RESPONSE */}
 
@@ -446,20 +498,13 @@ export default function Reports() {
 
                 <h3
                   style={{
-                    color: "#1B5E20",
-                    marginBottom: "12px"
+                    color: "#1B5E20"
                   }}
                 >
                   Barangay Response
                 </h3>
 
-                <p
-                  style={{
-                    margin: 0,
-                    lineHeight: "1.8",
-                    color: "#2E7D32"
-                  }}
-                >
+                <p>
                   {report.adminSolution}
                 </p>
 
