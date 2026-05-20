@@ -13,7 +13,8 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  CartesianGrid
+  CartesianGrid,
+  ResponsiveContainer
 } from "recharts";
 
 export default function AdminDashboard() {
@@ -58,13 +59,13 @@ export default function AdminDashboard() {
           (doc) => doc.data()
         );
 
-      // COUNT CATEGORIES
+      // COUNT REPORT CATEGORIES
       const categoryCounts = {};
 
       reports.forEach((report) => {
 
         const category =
-          report.category;
+          report.category || "Others";
 
         if (!categoryCounts[category]) {
           categoryCounts[category] = 0;
@@ -73,7 +74,7 @@ export default function AdminDashboard() {
         categoryCounts[category]++;
       });
 
-      // CONVERT FOR CHART
+      // CHART DATA
       const chartData =
         Object.keys(categoryCounts).map(
           (key) => ({
@@ -90,81 +91,189 @@ export default function AdminDashboard() {
   }, []);
 
   return (
+
     <div
       style={{
-        padding: "20px",
-        fontFamily: "Arial"
+        minHeight: "100vh",
+        background:
+          "linear-gradient(to bottom, #f4f7f4, #e8f5e9)",
+        padding: "40px",
+        fontFamily:
+          "'Segoe UI', sans-serif"
       }}
     >
 
-      <h1>📊 Admin Dashboard</h1>
-
-      {/* STATS */}
+      {/* HEADER */}
       <div
         style={{
-          display: "flex",
-          gap: "20px",
-          marginBottom: "30px"
+          marginBottom: "35px"
         }}
       >
 
-        {/* USERS */}
+        <h1
+          style={{
+            color: "#1B5E20",
+            fontSize: "38px",
+            marginBottom: "10px",
+            fontWeight: "700"
+          }}
+        >
+          Admin Dashboard
+        </h1>
+
+        <p
+          style={{
+            color: "#555",
+            fontSize: "16px"
+          }}
+        >
+          Barangay Ucab Information System
+        </p>
+
+      </div>
+
+      {/* STAT CARDS */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "25px",
+          marginBottom: "40px"
+        }}
+      >
+
+        {/* RESIDENTS */}
         <div
           style={{
-            border: "1px solid #ccc",
-            padding: "20px",
-            borderRadius: "10px",
-            width: "200px"
+            backgroundColor: "white",
+            borderRadius: "20px",
+            padding: "30px",
+            boxShadow:
+              "0 8px 20px rgba(0,0,0,0.08)",
+            borderLeft:
+              "8px solid #2E7D32"
           }}
         >
 
-          <h2>👥 Residents</h2>
+          <h2
+            style={{
+              color: "#444",
+              fontSize: "18px",
+              marginBottom: "15px"
+            }}
+          >
+            Total Residents
+          </h2>
 
-          <p>{userCount}</p>
+          <h1
+            style={{
+              color: "#1B5E20",
+              fontSize: "42px",
+              margin: 0
+            }}
+          >
+            {userCount}
+          </h1>
 
         </div>
 
         {/* POSTS */}
         <div
           style={{
-            border: "1px solid #ccc",
-            padding: "20px",
-            borderRadius: "10px",
-            width: "200px"
+            backgroundColor: "white",
+            borderRadius: "20px",
+            padding: "30px",
+            boxShadow:
+              "0 8px 20px rgba(0,0,0,0.08)",
+            borderLeft:
+              "8px solid #43A047"
           }}
         >
 
-          <h2>📝 Posts</h2>
+          <h2
+            style={{
+              color: "#444",
+              fontSize: "18px",
+              marginBottom: "15px"
+            }}
+          >
+            Community Posts
+          </h2>
 
-          <p>{postCount}</p>
+          <h1
+            style={{
+              color: "#1B5E20",
+              fontSize: "42px",
+              margin: 0
+            }}
+          >
+            {postCount}
+          </h1>
 
         </div>
 
       </div>
 
-      {/* CHART */}
-      <h2>🚨 Reports Analytics</h2>
-
-      <BarChart
-        width={700}
-        height={300}
-        data={reportData}
+      {/* ANALYTICS */}
+      <div
+        style={{
+          backgroundColor: "white",
+          borderRadius: "25px",
+          padding: "30px",
+          boxShadow:
+            "0 8px 20px rgba(0,0,0,0.08)"
+        }}
       >
 
-        <CartesianGrid strokeDasharray="3 3" />
+        <h2
+          style={{
+            color: "#1B5E20",
+            marginBottom: "30px",
+            fontSize: "28px"
+          }}
+        >
+          Reports Analytics
+        </h2>
 
-        <XAxis dataKey="category" />
+        <div
+          style={{
+            width: "100%",
+            height: "400px"
+          }}
+        >
 
-        <YAxis />
+          <ResponsiveContainer>
 
-        <Tooltip />
+            <BarChart
+              data={reportData}
+            >
 
-        <Bar
-          dataKey="reports"
-          fill="#1877f2"
-        />
+              <CartesianGrid
+                strokeDasharray="3 3"
+              />
 
-      </BarChart>
+              <XAxis
+                dataKey="category"
+              />
+
+              <YAxis />
+
+              <Tooltip />
+
+              <Bar
+                dataKey="reports"
+                fill="#2E7D32"
+                radius={[8, 8, 0, 0]}
+              />
+
+            </BarChart>
+
+          </ResponsiveContainer>
+
+        </div>
+
+      </div>
 
     </div>
   );

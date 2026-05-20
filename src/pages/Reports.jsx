@@ -64,9 +64,6 @@ export default function Reports() {
       category.trim() === "" ||
       details.trim() === ""
     ) {
-      alert(
-        "Please complete all fields."
-      );
 
       return;
     }
@@ -96,8 +93,6 @@ export default function Reports() {
         }
       );
 
-      alert("Report submitted!");
-
       setCategory("");
       setDetails("");
 
@@ -108,88 +103,193 @@ export default function Reports() {
   };
 
   return (
+
     <div
       style={{
-        maxWidth: "700px",
-        margin: "20px auto",
-        fontFamily: "Arial"
+        minHeight: "100vh",
+        background:
+          "linear-gradient(to bottom, #f4f7f4, #e8f5e9)",
+        padding: "40px",
+        fontFamily:
+          "'Segoe UI', sans-serif"
       }}
     >
 
-      <h1>
-        📋 Resident Reports
-      </h1>
+      {/* HEADER */}
 
-      {/* REPORT FORM */}
       <div
         style={{
-          marginBottom: "20px"
+          marginBottom: "35px"
         }}
       >
 
-        {/* CATEGORY */}
-        <select
-          value={category}
-          onChange={(e) =>
-            setCategory(e.target.value)
-          }
+        <h1
           style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "10px"
+            color: "#1B5E20",
+            fontSize: "42px",
+            marginBottom: "10px",
+            fontWeight: "700"
+          }}
+        >
+          Resident Reports
+        </h1>
+
+        <p
+          style={{
+            color: "#555",
+            fontSize: "16px"
+          }}
+        >
+          Submit concerns and track barangay responses.
+        </p>
+
+      </div>
+
+      {/* REPORT FORM */}
+
+      <div
+        style={{
+          backgroundColor: "white",
+          padding: "30px",
+          borderRadius: "25px",
+          marginBottom: "35px",
+          boxShadow:
+            "0 8px 20px rgba(0,0,0,0.08)"
+        }}
+      >
+
+        <h2
+          style={{
+            color: "#1B5E20",
+            marginBottom: "25px"
+          }}
+        >
+          Submit New Report
+        </h2>
+
+        {/* CATEGORY */}
+
+        <div
+          style={{
+            marginBottom: "20px"
           }}
         >
 
-          <option value="">
-            Select Concern Type
-          </option>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "10px",
+              color: "#1B5E20",
+              fontWeight: "600"
+            }}
+          >
+            Concern Category
+          </label>
 
-          <option value="Garbage">
-            Garbage
-          </option>
+          <select
+            value={category}
+            onChange={(e) =>
+              setCategory(e.target.value)
+            }
+            style={{
+              width: "100%",
+              padding: "15px",
+              borderRadius: "15px",
+              border:
+                "1px solid #ccc",
+              fontSize: "15px",
+              outline: "none"
+            }}
+          >
 
-          <option value="Road Damage">
-            Road Damage
-          </option>
+            <option value="">
+              Select Concern Type
+            </option>
 
-          <option value="Noise Complaint">
-            Noise Complaint
-          </option>
+            <option value="Garbage">
+              Garbage
+            </option>
 
-          <option value="Water Problem">
-            Water Problem
-          </option>
+            <option value="Road Damage">
+              Road Damage
+            </option>
 
-          <option value="Emergency">
-            Emergency
-          </option>
+            <option value="Noise Complaint">
+              Noise Complaint
+            </option>
 
-          <option value="Others">
-            Others
-          </option>
+            <option value="Water Problem">
+              Water Problem
+            </option>
 
-        </select>
+            <option value="Emergency">
+              Emergency
+            </option>
+
+            <option value="Others">
+              Others
+            </option>
+
+          </select>
+
+        </div>
 
         {/* DETAILS */}
-        <textarea
-          placeholder="Explain your concern in detail..."
-          value={details}
-          onChange={(e) =>
-            setDetails(e.target.value)
-          }
+
+        <div
           style={{
-            width: "100%",
-            height: "120px",
-            padding: "10px",
-            marginBottom: "10px"
+            marginBottom: "25px"
           }}
-        />
+        >
+
+          <label
+            style={{
+              display: "block",
+              marginBottom: "10px",
+              color: "#1B5E20",
+              fontWeight: "600"
+            }}
+          >
+            Concern Details
+          </label>
+
+          <textarea
+            placeholder="Explain your concern in detail..."
+            value={details}
+            onChange={(e) =>
+              setDetails(e.target.value)
+            }
+            style={{
+              width: "100%",
+              height: "150px",
+              padding: "18px",
+              borderRadius: "15px",
+              border:
+                "1px solid #ccc",
+              fontSize: "15px",
+              outline: "none",
+              resize: "none",
+              fontFamily:
+                "'Segoe UI', sans-serif"
+            }}
+          />
+
+        </div>
 
         {/* SUBMIT */}
+
         <button
           onClick={submitReport}
           style={{
-            padding: "10px 20px"
+            background:
+              "linear-gradient(90deg,#1B5E20,#43A047)",
+            color: "white",
+            border: "none",
+            padding: "14px 28px",
+            borderRadius: "14px",
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "15px"
           }}
         >
           Submit Report
@@ -198,62 +298,180 @@ export default function Reports() {
       </div>
 
       {/* REPORT LIST */}
-      {reports.map((report) => (
 
-        <div
-          key={report.id}
+      <div
+        style={{
+          marginTop: "30px"
+        }}
+      >
+
+        <h2
           style={{
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            padding: "15px",
-            marginBottom: "20px"
+            color: "#1B5E20",
+            marginBottom: "25px"
           }}
         >
+          My Submitted Reports
+        </h2>
 
-          {/* CATEGORY */}
-          <h3>
-            🚨 {report.category}
-          </h3>
+        {reports.length === 0 && (
 
-          {/* CONCERN */}
-          <p>
-            {report.concern}
-          </p>
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "30px",
+              borderRadius: "25px",
+              textAlign: "center",
+              boxShadow:
+                "0 8px 20px rgba(0,0,0,0.08)"
+            }}
+          >
 
-          {/* STATUS */}
-          <p>
-            <strong>Status:</strong>
-            {" "}
-            {report.status}
-          </p>
+            <h3
+              style={{
+                color: "#1B5E20"
+              }}
+            >
+              No reports submitted yet.
+            </h3>
 
-          {/* ADMIN RESPONSE */}
-          {report.adminSolution && (
+          </div>
+
+        )}
+
+        {reports.map((report) => (
+
+          <div
+            key={report.id}
+            style={{
+              backgroundColor: "white",
+              padding: "30px",
+              borderRadius: "25px",
+              marginBottom: "25px",
+              boxShadow:
+                "0 8px 20px rgba(0,0,0,0.08)"
+            }}
+          >
+
+            {/* HEADER */}
 
             <div
               style={{
-                marginTop: "10px",
-                backgroundColor: "#f5f5f5",
-                padding: "10px",
-                borderRadius: "8px"
+                display: "flex",
+                justifyContent:
+                  "space-between",
+                alignItems: "center",
+                marginBottom: "20px",
+                flexWrap: "wrap",
+                gap: "10px"
               }}
             >
 
-              <strong>
-                Barangay Response:
-              </strong>
+              <h2
+                style={{
+                  color: "#1B5E20",
+                  margin: 0
+                }}
+              >
+                {report.category}
+              </h2>
 
-              <p>
-                {report.adminSolution}
+              <div
+                style={{
+                  backgroundColor:
+                    report.status ===
+                    "Resolved"
+                      ? "#E8F5E9"
+                      : "#FFF8E1",
+
+                  color:
+                    report.status ===
+                    "Resolved"
+                      ? "#2E7D32"
+                      : "#F57F17",
+
+                  padding:
+                    "10px 18px",
+
+                  borderRadius:
+                    "30px",
+
+                  fontWeight: "600",
+
+                  fontSize: "14px"
+                }}
+              >
+                {report.status}
+              </div>
+
+            </div>
+
+            {/* CONCERN */}
+
+            <div
+              style={{
+                backgroundColor:
+                  "#f8f8f8",
+                padding: "20px",
+                borderRadius: "18px",
+                marginBottom: "20px"
+              }}
+            >
+
+              <p
+                style={{
+                  fontSize: "16px",
+                  lineHeight: "1.8",
+                  color: "#333",
+                  margin: 0
+                }}
+              >
+                {report.concern}
               </p>
 
             </div>
 
-          )}
+            {/* RESPONSE */}
 
-        </div>
+            {report.adminSolution && (
 
-      ))}
+              <div
+                style={{
+                  backgroundColor:
+                    "#E8F5E9",
+                  padding: "20px",
+                  borderRadius: "18px"
+                }}
+              >
+
+                <h3
+                  style={{
+                    color: "#1B5E20",
+                    marginBottom: "12px"
+                  }}
+                >
+                  Barangay Response
+                </h3>
+
+                <p
+                  style={{
+                    margin: 0,
+                    lineHeight: "1.8",
+                    color: "#2E7D32"
+                  }}
+                >
+                  {report.adminSolution}
+                </p>
+
+              </div>
+
+            )}
+
+          </div>
+
+        ))}
+
+      </div>
 
     </div>
   );

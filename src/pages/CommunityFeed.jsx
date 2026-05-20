@@ -9,7 +9,8 @@ import {
   onSnapshot,
   serverTimestamp,
   updateDoc,
-  doc
+  doc,
+  arrayUnion
 } from "firebase/firestore";
 
 import {
@@ -24,6 +25,9 @@ export default function CommunityFeed() {
 
   const [posts, setPosts] =
     useState([]);
+
+  const [comments, setComments] =
+    useState({});
 
   // LOAD POSTS
   useEffect(() => {
@@ -65,6 +69,7 @@ export default function CommunityFeed() {
           content: post,
           likes: 0,
           likedBy: [],
+          comments: [],
           createdAt: serverTimestamp()
         }
       );
@@ -93,9 +98,6 @@ export default function CommunityFeed() {
       likedBy &&
       likedBy.includes(user.uid)
     ) {
-      alert(
-        "You already liked this post."
-      );
 
       return;
     }
@@ -119,127 +121,406 @@ export default function CommunityFeed() {
     }
   };
 
+  // ADD COMMENT
+  const addComment = async (
+    postId
+  ) => {
+
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    if (
+      !comments[postId] ||
+      comments[postId].trim() === ""
+    ) {
+      return;
+    }
+
+    try {
+
+      const postRef =
+        doc(db, "posts", postId);
+
+      await updateDoc(postRef, {
+
+        comments: arrayUnion({
+          author: user.email,
+          text: comments[postId]
+        })
+
+      });
+
+      setComments({
+        ...comments,
+        [postId]: ""
+      });
+
+    } catch (error) {
+
+      console.error(error);
+    }
+  };
+
   return (
+
     <div
       style={{
-        maxWidth: "900px",
-        margin: "20px auto",
-        fontFamily: "Arial"
+        minHeight: "100vh",
+        background:
+          "linear-gradient(to bottom, #f4f7f4, #e8f5e9)",
+        padding: "40px",
+        fontFamily:
+          "'Segoe UI', sans-serif"
       }}
     >
 
-      <h1
+      {/* HEADER */}
+
+      <div
         style={{
-          fontSize: "45px",
-          color: "#1B5E20",
-          marginBottom: "30px"
+          marginBottom: "35px"
         }}
       >
-        🏘 Community Feed
-      </h1>
+
+        <h1
+          style={{
+            fontSize: "42px",
+            color: "#1B5E20",
+            marginBottom: "10px",
+            fontWeight: "700"
+          }}
+        >
+          Community Feed
+        </h1>
+
+        <p
+          style={{
+            color: "#555",
+            fontSize: "16px"
+          }}
+        >
+          Share updates and announcements with Barangay Ucab residents.
+        </p>
+
+      </div>
 
       {/* CREATE POST */}
+
       <div
         style={{
           backgroundColor: "white",
-          padding: "25px",
-          borderRadius: "20px",
-          marginBottom: "30px",
+          padding: "30px",
+          borderRadius: "25px",
+          marginBottom: "35px",
           boxShadow:
-            "0 4px 10px rgba(0,0,0,0.1)"
+            "0 8px 20px rgba(0,0,0,0.08)"
         }}
       >
 
+        <h2
+          style={{
+            color: "#1B5E20",
+            marginBottom: "20px"
+          }}
+        >
+          Create New Post
+        </h2>
+
         <textarea
-          placeholder="What's happening in Barangay Ucab?"
+          placeholder="Share updates with the community..."
           value={post}
           onChange={(e) =>
             setPost(e.target.value)
           }
           style={{
             width: "100%",
-            height: "120px",
-            padding: "15px",
-            borderRadius: "12px",
+            height: "140px",
+            padding: "18px",
+            borderRadius: "15px",
             border: "1px solid #ccc",
-            marginBottom: "15px",
-            fontSize: "16px"
+            marginBottom: "20px",
+            fontSize: "16px",
+            resize: "none",
+            outline: "none",
+            fontFamily:
+              "'Segoe UI', sans-serif"
           }}
         />
 
         <button
           onClick={createPost}
           style={{
-            backgroundColor: "#1B5E20",
+            background:
+              "linear-gradient(90deg,#1B5E20,#43A047)",
             color: "white",
             border: "none",
-            padding: "12px 24px",
-            borderRadius: "12px",
+            padding: "14px 28px",
+            borderRadius: "14px",
             cursor: "pointer",
-            fontWeight: "bold"
+            fontWeight: "600",
+            fontSize: "15px"
           }}
         >
-          Post
+          Publish Post
         </button>
 
       </div>
 
       {/* POSTS */}
+
+      {posts.length === 0 && (
+
+        <div
+          style={{
+            backgroundColor: "white",
+            padding: "30px",
+            borderRadius: "25px",
+            textAlign: "center",
+            boxShadow:
+              "0 8px 20px rgba(0,0,0,0.08)"
+          }}
+        >
+
+          <h2
+            style={{
+              color: "#1B5E20"
+            }}
+          >
+            No community posts yet.
+          </h2>
+
+        </div>
+
+      )}
+
       {posts.map((item) => (
 
         <div
           key={item.id}
           style={{
             backgroundColor: "white",
-            padding: "25px",
-            borderRadius: "20px",
-            marginBottom: "20px",
+            padding: "30px",
+            borderRadius: "25px",
+            marginBottom: "25px",
             boxShadow:
-              "0 4px 10px rgba(0,0,0,0.1)"
+              "0 8px 20px rgba(0,0,0,0.08)"
           }}
         >
 
           {/* AUTHOR */}
-          <h3
+
+          <div
             style={{
-              color: "#1B5E20",
-              marginBottom: "10px"
+              marginBottom: "18px"
             }}
           >
-            👤 {item.author}
-          </h3>
+
+            <h3
+              style={{
+                color: "#1B5E20",
+                marginBottom: "6px"
+              }}
+            >
+              {item.author}
+            </h3>
+
+            <p
+              style={{
+                color: "#888",
+                fontSize: "14px",
+                margin: 0
+              }}
+            >
+              Barangay Ucab Resident
+            </p>
+
+          </div>
 
           {/* CONTENT */}
-          <p
+
+          <div
             style={{
-              fontSize: "18px",
-              lineHeight: "1.7",
+              backgroundColor:
+                "#f8f8f8",
+              padding: "20px",
+              borderRadius: "18px",
               marginBottom: "20px"
             }}
           >
-            {item.content}
-          </p>
 
-          {/* LIKE BUTTON */}
-          <button
-            onClick={() =>
-              likePost(
-                item.id,
-                item.likes,
-                item.likedBy
-              )
-            }
+            <p
+              style={{
+                fontSize: "17px",
+                lineHeight: "1.8",
+                color: "#333",
+                margin: 0
+              }}
+            >
+              {item.content}
+            </p>
+
+          </div>
+
+          {/* ACTIONS */}
+
+          <div
             style={{
-              backgroundColor: "#43A047",
-              color: "white",
-              border: "none",
-              padding: "10px 18px",
-              borderRadius: "10px",
-              cursor: "pointer"
+              display: "flex",
+              justifyContent:
+                "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "15px",
+              marginBottom: "25px"
             }}
           >
-            👍 Like ({item.likes || 0})
-          </button>
+
+            <div
+              style={{
+                color: "#666",
+                fontSize: "15px",
+                fontWeight: "500"
+              }}
+            >
+              {item.likes || 0} Likes
+            </div>
+
+            <button
+              onClick={() =>
+                likePost(
+                  item.id,
+                  item.likes,
+                  item.likedBy
+                )
+              }
+              style={{
+                backgroundColor:
+                  "#43A047",
+                color: "white",
+                border: "none",
+                padding:
+                  "12px 22px",
+                borderRadius: "12px",
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px"
+              }}
+            >
+              Like Post
+            </button>
+
+          </div>
+
+          {/* COMMENTS */}
+
+          <div
+            style={{
+              marginTop: "15px"
+            }}
+          >
+
+            <h4
+              style={{
+                color: "#1B5E20",
+                marginBottom: "15px"
+              }}
+            >
+              Comments
+            </h4>
+
+            {/* COMMENT LIST */}
+
+            {item.comments &&
+              item.comments.map(
+                (comment, index) => (
+
+                  <div
+                    key={index}
+                    style={{
+                      backgroundColor:
+                        "#f5f5f5",
+                      padding: "14px",
+                      borderRadius: "14px",
+                      marginBottom: "12px"
+                    }}
+                  >
+
+                    <strong>
+                      {comment.author}
+                    </strong>
+
+                    <p
+                      style={{
+                        marginTop: "6px",
+                        marginBottom: 0,
+                        lineHeight: "1.6"
+                      }}
+                    >
+                      {comment.text}
+                    </p>
+
+                  </div>
+
+                )
+              )}
+
+            {/* COMMENT INPUT */}
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginTop: "15px"
+              }}
+            >
+
+              <input
+                type="text"
+                placeholder="Write a comment..."
+                value={
+                  comments[item.id] || ""
+                }
+                onChange={(e) =>
+                  setComments({
+                    ...comments,
+                    [item.id]:
+                      e.target.value
+                  })
+                }
+                style={{
+                  flex: 1,
+                  padding: "14px",
+                  borderRadius: "12px",
+                  border:
+                    "1px solid #ccc",
+                  outline: "none",
+                  fontSize: "15px"
+                }}
+              />
+
+              <button
+                onClick={() =>
+                  addComment(item.id)
+                }
+                style={{
+                  background:
+                    "linear-gradient(90deg,#1B5E20,#43A047)",
+                  color: "white",
+                  border: "none",
+                  padding:
+                    "12px 20px",
+                  borderRadius: "12px",
+                  cursor: "pointer",
+                  fontWeight: "600"
+                }}
+              >
+                Comment
+              </button>
+
+            </div>
+
+          </div>
 
         </div>
 

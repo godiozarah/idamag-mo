@@ -80,11 +80,9 @@ export default function Home() {
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "rgba(0,0,0,0.45)",
+            inset: 0,
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.65), rgba(0,0,0,0.45))",
             zIndex: 1,
           }}
         />
@@ -107,10 +105,11 @@ export default function Home() {
               style={{
                 fontSize: "85px",
                 marginBottom: "20px",
-                textShadow: "0 4px 10px rgba(0,0,0,0.5)",
+                fontWeight: "bold",
+                textShadow: "0 4px 12px rgba(0,0,0,0.5)",
               }}
             >
-              Barangay Ucab
+              Idamag.mo
             </h1>
 
             <p
@@ -122,7 +121,7 @@ export default function Home() {
                 textShadow: "0 2px 8px rgba(0,0,0,0.5)",
               }}
             >
-              A modern digital barangay information system for residents of
+              Smart Barangay Information System with AI Assistance for
               Barangay Ucab, Itogon, Benguet.
             </p>
 
@@ -186,7 +185,6 @@ export default function Home() {
             margin: "0 auto",
           }}
         >
-          {/* TITLE */}
           <div
             style={{
               textAlign: "center",
@@ -209,7 +207,7 @@ export default function Home() {
                 color: "#555",
               }}
             >
-              Online services and resources for the residents of Barangay Ucab.
+              Online services and resources for Barangay Ucab residents.
             </p>
           </div>
 
@@ -234,14 +232,7 @@ export default function Home() {
                   boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
                   textAlign: "center",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-10px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
               >
-                {/* IMAGE */}
                 <div
                   style={{
                     width: "140px",
@@ -266,61 +257,25 @@ export default function Home() {
                   />
                 </div>
 
-                {/* TITLE */}
                 <h3
                   style={{
                     fontSize: "30px",
                     color: "#1B5E20",
                     marginBottom: "15px",
-                    wordBreak: "break-word",
-                    lineHeight: "1.2",
                   }}
                 >
                   {service.title}
                 </h3>
 
-                {/* LINE */}
-                <div
-                  style={{
-                    width: "60px",
-                    height: "5px",
-                    backgroundColor: "#2E7D32",
-                    margin: "0 auto 25px auto",
-                    borderRadius: "20px",
-                  }}
-                />
-
-                {/* DESCRIPTION */}
                 <p
                   style={{
-                    fontSize: "21px",
+                    fontSize: "20px",
                     lineHeight: "1.7",
                     color: "#444",
-                    minHeight: "90px",
                   }}
                 >
                   {service.description}
                 </p>
-
-                {/* BUTTON */}
-                <div
-                  style={{
-                    marginTop: "20px",
-                    background: "linear-gradient(90deg,#1B5E20,#2E7D32)",
-                    color: "white",
-                    padding: "12px 20px",
-                    borderRadius: "12px",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    width: "75%",
-                    margin: "20px auto 0 auto",
-                    textAlign: "center",
-                    display: "block",
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                  }}
-                >
-                  Access Service →
-                </div>
               </div>
             ))}
           </div>
@@ -350,15 +305,6 @@ export default function Home() {
           >
             Barangay Officials
           </h2>
-
-          <p
-            style={{
-              textAlign: "center",
-              marginBottom: "60px",
-            }}
-          >
-            Official elected leaders of Barangay Ucab 2023–2025
-          </p>
 
           <img
             src={officials1}
@@ -398,27 +344,15 @@ export default function Home() {
               width: "70px",
               height: "70px",
               borderRadius: "50%",
-              objectFit: "cover",
               backgroundColor: "white",
               padding: "4px",
             }}
           />
 
           <div>
-            <h2
-              style={{
-                margin: "0",
-              }}
-            >
-              idamag.mo
-            </h2>
+            <h2>Idamag.mo</h2>
 
-            <p
-              style={{
-                margin: "5px 0 0 0",
-                color: "#aaa",
-              }}
-            >
+            <p style={{ color: "#aaa" }}>
               Official Digital Platform of Barangay Ucab, Itogon, Benguet.
             </p>
           </div>
