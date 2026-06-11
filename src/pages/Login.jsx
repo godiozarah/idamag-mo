@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -16,9 +17,43 @@ export default function Login() {
         password
       );
 
+      await Swal.fire({
+  icon: "success",
+  title: "Welcome Back!",
+  html: `
+    <div style="font-size:16px">
+      <b>Login Successful</b>
+      <br><br>
+      Welcome back to iDamag.mo.
+      <br>
+      Have a great day, resident!
+    </div>
+  `,
+  confirmButtonColor: "#1B5E20",
+  confirmButtonText: "Continue",
+  backdrop: true
+});
+
       window.location.href = "/";
+
     } catch (error) {
-      alert(error.message);
+
+      if (error.code === "auth/invalid-credential") {
+        Swal.fire({
+  icon: "error",
+  title: "Login Failed",
+  text: "Invalid email or password.",
+  confirmButtonColor: "#d32f2f"
+});
+      } else {
+       Swal.fire({
+  icon: "error",
+  title: "Oops!",
+  text: error.message,
+  confirmButtonColor: "#d32f2f"
+});
+      }
+
     }
   };
 
@@ -83,9 +118,11 @@ export default function Login() {
               lineHeight: "1.8"
             }}
           >
-            Welcome to idamag.mo — your modern barangay information portal.
-            Access announcements, reports, community services, and AI-powered
-            assistance for residents of Barangay Ucab, Itogon, Benguet.
+            Welcome to idamag.mo — your modern barangay
+            information portal. Access announcements,
+            reports, community services, and AI-powered
+            assistance for residents of Barangay Ucab,
+            Itogon, Benguet.
           </p>
         </div>
 
@@ -93,7 +130,7 @@ export default function Login() {
         <div
           style={{
             flex: 1,
-            padding: "60px 40px",
+            padding: "60px 50px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center"
@@ -103,7 +140,8 @@ export default function Login() {
             style={{
               fontSize: "40px",
               color: "#1B5E20",
-              marginBottom: "10px"
+              marginBottom: "10px",
+              textAlign: "center"
             }}
           >
             Welcome Back
@@ -112,13 +150,19 @@ export default function Login() {
           <p
             style={{
               color: "gray",
-              marginBottom: "35px"
+              marginBottom: "35px",
+              textAlign: "center"
             }}
           >
             Login to continue to your barangay portal.
           </p>
 
-          <form onSubmit={handleLogin}>
+          <form
+            onSubmit={handleLogin}
+            style={{
+              width: "100%"
+            }}
+          >
             <div style={{ marginBottom: "20px" }}>
               <label
                 style={{
@@ -135,14 +179,17 @@ export default function Login() {
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
                 style={{
                   width: "100%",
                   padding: "14px",
                   borderRadius: "12px",
                   border: "1px solid #ccc",
                   fontSize: "16px",
-                  outline: "none"
+                  outline: "none",
+                  boxSizing: "border-box"
                 }}
                 required
               />
@@ -173,7 +220,8 @@ export default function Login() {
                   borderRadius: "12px",
                   border: "1px solid #ccc",
                   fontSize: "16px",
-                  outline: "none"
+                  outline: "none",
+                  boxSizing: "border-box"
                 }}
                 required
               />

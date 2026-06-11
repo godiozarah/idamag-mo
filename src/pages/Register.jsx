@@ -9,6 +9,8 @@ import {
   setDoc
 } from "firebase/firestore";
 
+import Swal from "sweetalert2";
+
 import {
   auth,
   db
@@ -16,11 +18,8 @@ import {
 
 export default function Register() {
 
-  const [email, setEmail] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleRegister = async (e) => {
 
@@ -28,7 +27,6 @@ export default function Register() {
 
     try {
 
-      // CREATE ACCOUNT
       const userCredential =
         await createUserWithEmailAndPassword(
           auth,
@@ -39,7 +37,6 @@ export default function Register() {
       const user =
         userCredential.user;
 
-      // SAVE USER DATA
       await setDoc(
         doc(db, "users", user.uid),
         {
@@ -48,17 +45,60 @@ export default function Register() {
         }
       );
 
-      window.location.href =
-        "/login";
+      await Swal.fire({
+  icon: "success",
+  title: "Welcome to iDamag.mo!",
+  html: `
+    <div style="font-size:16px">
+      <b>Account Created Successfully</b>
+      <br><br>
+      You may now access announcements,
+      report community concerns,
+      and use the AI Assistant.
+    </div>
+  `,
+  confirmButtonColor: "#1B5E20",
+  confirmButtonText: "Login Now",
+  backdrop: true
+});
+
+      window.location.href = "/login";
 
     } catch (error) {
 
-      alert(error.message);
+      if (
+        error.code === "auth/email-already-in-use"
+      ) {
+
+        await Swal.fire({
+  icon: "error",
+  title: "Registration Failed",
+  text: "This email is already registered.",
+  confirmButtonColor: "#d32f2f"
+});
+
+      } else if (
+        error.code === "auth/weak-password"
+      ) {
+
+        Swal.fire({
+  icon: "warning",
+  title: "Weak Password",
+  text: "Password should be at least 6 characters.",
+  confirmButtonColor: "#ff9800"
+});
+
+      } else {
+
+        alert(error.message);
+
+      }
+
     }
+
   };
 
   return (
-
     <div
       style={{
         minHeight: "100vh",
@@ -70,7 +110,6 @@ export default function Register() {
         padding: "20px"
       }}
     >
-
       <div
         style={{
           width: "100%",
@@ -84,7 +123,6 @@ export default function Register() {
       >
 
         {/* LEFT SIDE */}
-
         <div
           style={{
             flex: 1,
@@ -97,7 +135,6 @@ export default function Register() {
             justifyContent: "center"
           }}
         >
-
           <img
             src="/icons.svg"
             alt="Barangay Logo"
@@ -127,15 +164,13 @@ export default function Register() {
             barangay announcements, reports, community updates,
             and AI-powered assistance for Barangay Ucab residents.
           </p>
-
         </div>
 
         {/* RIGHT SIDE */}
-
         <div
           style={{
             flex: 1,
-            padding: "60px 40px",
+            padding: "60px 50px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center"
@@ -146,7 +181,8 @@ export default function Register() {
             style={{
               fontSize: "40px",
               color: "#1B5E20",
-              marginBottom: "10px"
+              marginBottom: "10px",
+              textAlign: "center"
             }}
           >
             Create Account
@@ -155,7 +191,8 @@ export default function Register() {
           <p
             style={{
               color: "gray",
-              marginBottom: "35px"
+              marginBottom: "35px",
+              textAlign: "center"
             }}
           >
             Register to access your barangay portal.
@@ -164,7 +201,6 @@ export default function Register() {
           <form onSubmit={handleRegister}>
 
             <div style={{ marginBottom: "20px" }}>
-
               <label
                 style={{
                   display: "block",
@@ -189,15 +225,14 @@ export default function Register() {
                   borderRadius: "12px",
                   border: "1px solid #ccc",
                   fontSize: "16px",
-                  outline: "none"
+                  outline: "none",
+                  boxSizing: "border-box"
                 }}
                 required
               />
-
             </div>
 
             <div style={{ marginBottom: "25px" }}>
-
               <label
                 style={{
                   display: "block",
@@ -222,11 +257,11 @@ export default function Register() {
                   borderRadius: "12px",
                   border: "1px solid #ccc",
                   fontSize: "16px",
-                  outline: "none"
+                  outline: "none",
+                  boxSizing: "border-box"
                 }}
                 required
               />
-
             </div>
 
             <button
@@ -261,7 +296,6 @@ export default function Register() {
         </div>
 
       </div>
-
     </div>
   );
 }
