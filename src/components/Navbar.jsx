@@ -1,82 +1,76 @@
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   useEffect,
-  useState
+  useState,
 } from "react";
 
 import {
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from "firebase/auth";
 
 import {
   doc,
-  getDoc
+  getDoc,
 } from "firebase/firestore";
 
 import {
   auth,
-  db
+  db,
 } from "../firebase";
 
 import barangayseal from "../assets/barangayseal.png";
 
 export default function Navbar() {
 
-  const [user, setUser] =
-    useState(null);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const [isAdmin, setIsAdmin] =
-    useState(false);
+  const navigate = useNavigate();
 
   // CHECK ROLE
   useEffect(() => {
 
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (currentUser) => {
 
-          setUser(currentUser);
+        setUser(currentUser);
 
-          if (!currentUser) {
-
-            setIsAdmin(false);
-
-            return;
-          }
-
-          try {
-
-            const docRef =
-              doc(
-                db,
-                "users",
-                currentUser.uid
-              );
-
-            const docSnap =
-              await getDoc(docRef);
-
-            if (
-              docSnap.exists() &&
-              docSnap.data().role === "admin"
-            ) {
-
-              setIsAdmin(true);
-
-            } else {
-
-              setIsAdmin(false);
-            }
-
-          } catch (error) {
-
-            console.error(error);
-          }
+        if (!currentUser) {
+          setIsAdmin(false);
+          return;
         }
-      );
+
+        try {
+
+          const docRef = doc(
+            db,
+            "users",
+            currentUser.uid
+          );
+
+          const docSnap = await getDoc(docRef);
+
+          if (
+            docSnap.exists() &&
+            docSnap.data().role === "admin"
+          ) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+
+        } catch (error) {
+          console.error(error);
+        }
+
+      }
+    );
 
     return () => unsubscribe();
 
@@ -85,9 +79,20 @@ export default function Navbar() {
   // LOGOUT
   const logout = async () => {
 
-    await signOut(auth);
+    try {
 
-    window.location.href = "/login";
+      await signOut(auth);
+
+      navigate("/login", {
+        replace: true,
+      });
+
+    } catch (error) {
+
+      console.error("Logout Error:", error);
+
+    }
+
   };
 
   return (
@@ -117,7 +122,6 @@ export default function Navbar() {
         }}
       >
 
-        {/* BARANGAY SEAL */}
         <img
           src={barangayseal}
           alt="Barangay Seal"
@@ -133,7 +137,6 @@ export default function Navbar() {
           }}
         />
 
-        {/* TITLE */}
         <div>
 
           <h2
@@ -171,7 +174,6 @@ export default function Navbar() {
         }}
       >
 
-        {/* HOME */}
         {user && (
           <Link
             to="/"
@@ -181,9 +183,6 @@ export default function Navbar() {
           </Link>
         )}
 
-      
-
-        {/* ADMIN */}
         {isAdmin && (
           <>
             <Link
@@ -202,7 +201,6 @@ export default function Navbar() {
           </>
         )}
 
-        {/* LOGIN */}
         {!user && (
           <Link
             to="/login"
@@ -212,7 +210,6 @@ export default function Navbar() {
           </Link>
         )}
 
-        {/* REGISTER */}
         {!user && (
           <Link
             to="/register"
@@ -222,7 +219,6 @@ export default function Navbar() {
           </Link>
         )}
 
-        {/* LOGOUT */}
         {user && (
           <button
             onClick={logout}
@@ -249,7 +245,6 @@ export default function Navbar() {
   );
 }
 
-// NAV LINK STYLE
 const navStyle = {
   color: "white",
   textDecoration: "none",

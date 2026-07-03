@@ -1,60 +1,93 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 import Swal from "sweetalert2";
 
+import { auth, db } from "../firebase";
+
 export default function Login() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
+
     e.preventDefault();
 
     try {
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+
+      const userCredential =
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+      const user =
+        userCredential.user;
+
+      const userDoc =
+        await getDoc(
+          doc(db, "users", user.uid)
+        );
+
+      const userData =
+        userDoc.data();
 
       await Swal.fire({
-  icon: "success",
-  title: "Welcome Back!",
-  html: `
-    <div style="font-size:16px">
-      <b>Login Successful</b>
-      <br><br>
-      Welcome back to iDamag.mo.
-      <br>
-      Have a great day, resident!
-    </div>
-  `,
-  confirmButtonColor: "#1B5E20",
-  confirmButtonText: "Continue",
-  backdrop: true
-});
+        icon: "success",
+        title: "Welcome Back!",
+        html: `
+          <div style="font-size:16px">
+            <b>Login Successful</b>
+            <br><br>
+            Welcome back to iDamag.mo.
+          </div>
+        `,
+        confirmButtonColor: "#1B5E20",
+        confirmButtonText: "Continue"
+      });
 
-      window.location.href = "/";
+      if (
+        userData?.role === "admin"
+      ) {
+
+        window.location.href =
+          "/admin";
+
+      } else {
+
+        window.location.href =
+          "/";
+
+      }
 
     } catch (error) {
 
-      if (error.code === "auth/invalid-credential") {
+      if (
+        error.code === "auth/invalid-credential"
+      ) {
+
         Swal.fire({
-  icon: "error",
-  title: "Login Failed",
-  text: "Invalid email or password.",
-  confirmButtonColor: "#d32f2f"
-});
+          icon: "error",
+          title: "Login Failed",
+          text: "Invalid email or password.",
+          confirmButtonColor: "#d32f2f"
+        });
+
       } else {
-       Swal.fire({
-  icon: "error",
-  title: "Oops!",
-  text: error.message,
-  confirmButtonColor: "#d32f2f"
-});
+
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: error.message,
+          confirmButtonColor: "#d32f2f"
+        });
+
       }
 
     }
+
   };
 
   return (
@@ -80,7 +113,6 @@ export default function Login() {
           boxShadow: "0 10px 40px rgba(0,0,0,0.25)"
         }}
       >
-        {/* LEFT SIDE */}
         <div
           style={{
             flex: 1,
@@ -126,7 +158,6 @@ export default function Login() {
           </p>
         </div>
 
-        {/* RIGHT SIDE */}
         <div
           style={{
             flex: 1,
