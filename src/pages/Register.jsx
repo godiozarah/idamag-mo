@@ -6,7 +6,11 @@ import {
 
 import {
   doc,
-  setDoc
+  setDoc,
+  getDoc,
+  updateDoc,
+  increment,
+  serverTimestamp
 } from "firebase/firestore";
 
 import Swal from "sweetalert2";
@@ -37,13 +41,34 @@ export default function Register() {
       const user =
         userCredential.user;
 
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          email: email,
-          role: "resident"
-        }
-      );
+      // Get resident counter
+const counterRef = doc(db, "counters", "residentCounter");
+
+const counterSnap = await getDoc(counterRef);
+
+let residentNumber = 1;
+
+if (counterSnap.exists()) {
+  residentNumber = counterSnap.data().current + 1;
+
+  await updateDoc(counterRef, {
+    current: increment(1),
+  });
+} else {
+  await setDoc(counterRef, {
+    current: 1,
+  });
+}
+
+// Save user
+await setDoc(doc(db, "users", user.uid), {
+  email,
+  role: "resident",
+  residentNumber,
+  avatar: "avatar1.png",
+  notifications: true,
+  createdAt: serverTimestamp(),
+});
 
       await Swal.fire({
   icon: "success",
@@ -90,7 +115,12 @@ export default function Register() {
 
       } else {
 
-        alert(error.message);
+        await Swal.fire({
+  icon: "error",
+  title: "Oops!",
+  text: error.message,
+  confirmButtonColor: "#d32f2f"
+});
 
       }
 

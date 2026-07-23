@@ -26,6 +26,7 @@ export default function ProtectedRoute({
         (currentUser) => {
 
           setUser(currentUser);
+
         }
       );
 
@@ -33,16 +34,21 @@ export default function ProtectedRoute({
 
   }, []);
 
-  // LOADING
+  // Loading
   if (user === undefined) {
+
     return <p>Loading...</p>;
+
   }
 
-  // NOT LOGGED IN
+  // Not logged in
   if (!user) {
-    return <Navigate to="/login" />;
+
+    return <Navigate to="/login" replace />;
+
   }
 
-  // LOGGED IN
+  // Logged in
   return children;
+
 }

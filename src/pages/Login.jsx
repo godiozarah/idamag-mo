@@ -1,9 +1,18 @@
 import { useState } from "react";
+
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+
+import {
+  doc,
+  getDoc
+} from "firebase/firestore";
+
 import Swal from "sweetalert2";
 
-import { auth, db } from "../firebase";
+import {
+  auth,
+  db
+} from "../firebase";
 
 export default function Login() {
 
@@ -27,14 +36,12 @@ export default function Login() {
         userCredential.user;
 
       const userDoc =
-        await getDoc(
-          doc(db, "users", user.uid)
-        );
+        await getDoc(doc(db, "users", user.uid));
 
       const userData =
         userDoc.data();
 
-      await Swal.fire({
+      await await Swal.fire({
         icon: "success",
         title: "Welcome Back!",
         html: `
@@ -52,13 +59,11 @@ export default function Login() {
         userData?.role === "admin"
       ) {
 
-        window.location.href =
-          "/admin";
+        window.location.href = "/admin";
 
       } else {
 
-        window.location.href =
-          "/";
+        window.location.href = "/";
 
       }
 
@@ -66,18 +71,27 @@ export default function Login() {
 
       if (
         error.code === "auth/invalid-credential"
-      ) {
-
-        Swal.fire({
+      ) {        await Swal.fire({
           icon: "error",
           title: "Login Failed",
           text: "Invalid email or password.",
           confirmButtonColor: "#d32f2f"
         });
 
+      } else if (
+        error.code === "auth/too-many-requests"
+      ) {
+
+        await Swal.fire({
+          icon: "warning",
+          title: "Too Many Attempts",
+          text: "Too many failed login attempts. Please try again later.",
+          confirmButtonColor: "#ff9800"
+        });
+
       } else {
 
-        Swal.fire({
+        await Swal.fire({
           icon: "error",
           title: "Oops!",
           text: error.message,
@@ -113,6 +127,9 @@ export default function Login() {
           boxShadow: "0 10px 40px rgba(0,0,0,0.25)"
         }}
       >
+
+        {/* LEFT SIDE */}
+
         <div
           style={{
             flex: 1,
@@ -156,7 +173,10 @@ export default function Login() {
             assistance for residents of Barangay Ucab,
             Itogon, Benguet.
           </p>
+
         </div>
+
+        {/* RIGHT SIDE */}
 
         <div
           style={{
@@ -167,6 +187,7 @@ export default function Login() {
             justifyContent: "center"
           }}
         >
+
           <h2
             style={{
               fontSize: "40px",
@@ -193,8 +214,7 @@ export default function Login() {
             style={{
               width: "100%"
             }}
-          >
-            <div style={{ marginBottom: "20px" }}>
+          >            <div style={{ marginBottom: "20px" }}>
               <label
                 style={{
                   display: "block",
@@ -274,6 +294,7 @@ export default function Login() {
             >
               Login
             </button>
+
           </form>
 
           <p
@@ -285,8 +306,12 @@ export default function Login() {
           >
             Powered by idamag.mo AI Assistance
           </p>
+
         </div>
+
       </div>
+
     </div>
   );
+
 }

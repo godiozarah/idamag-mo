@@ -33,7 +33,7 @@ export default function Home() {
       description:
         "Latest barangay announcements and updates.",
       image: announcementIcon,
-      action: () => navigate("/community"),
+      action: () => navigate("/announcements"),
     },
 
   ];
@@ -193,9 +193,7 @@ export default function Home() {
 
               <button
                 onClick={() =>
-                  navigate(
-                    "/community"
-                  )
+                  navigate("/announcements")
                 }
                 style={{
                   backgroundColor:
@@ -217,7 +215,7 @@ export default function Home() {
                     "blur(5px)",
                 }}
               >
-                Community Feed
+                View Announcements
               </button>
 
             </div>

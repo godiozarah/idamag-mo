@@ -1,0 +1,113 @@
+/* Background */
+body {
+  background: #f5f7fa;
+}
+
+/* Main Profile Card */
+.profile-card {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Avatar */
+.profile-avatar {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #198754;
+  transition: 0.3s;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Statistic Cards */
+.stat-card {
+  border-radius: 18px;
+  transition: 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,.15);
+}
+
+/* Avatar Picker */
+.avatar-option {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  border: 2px solid #ced4da;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s;
+  background: white;
+}
+
+.avatar-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-option:hover {
+  transform: scale(1.08);
+}
+
+.avatar-selected {
+  border: 4px solid #198754;
+}
+
+/* Section Titles */
+.section-title {
+  color: #198754;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Information Card */
+.info-card {
+  border-radius: 15px;
+}
+
+/* Password Input */
+.password-input {
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Buttons */
+.btn-success,
+.btn-danger {
+  border-radius: 12px;
+}
+
+/* Divider */
+.profile-divider {
+  margin: 40px 0;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .profile-avatar {
+    width: 110px;
+    height: 110px;
+  }
+
+  .avatar-option {
+    width: 70px;
+    height: 70px;
+  }
+
+  .stat-card {
+    margin-bottom: 15px;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+}
