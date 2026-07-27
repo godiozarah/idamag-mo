@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 
 import Swal from "sweetalert2";
-
+import { Link } from "react-router-dom";
 import {
   auth,
   db
@@ -161,18 +161,50 @@ export default function Login() {
             Barangay Ucab
           </h1>
 
-          <p
-            style={{
-              fontSize: "18px",
-              lineHeight: "1.8"
-            }}
-          >
-            Welcome to idamag.mo — your modern barangay
-            information portal. Access announcements,
-            reports, community services, and AI-powered
-            assistance for residents of Barangay Ucab,
-            Itogon, Benguet.
-          </p>
+          <div
+  style={{
+    marginTop: "25px",
+    textAlign: "center"
+  }}
+>
+  <p
+    style={{
+      color: "gray",
+      marginBottom: "15px"
+    }}
+  >
+    Don't have an account?
+  </p>
+
+  <Link
+    to="/register"
+    style={{
+      display: "inline-block",
+      width: "100%",
+      padding: "14px",
+      backgroundColor: "white",
+      color: "#1B5E20",
+      border: "2px solid #1B5E20",
+      borderRadius: "12px",
+      fontSize: "16px",
+      fontWeight: "bold",
+      textDecoration: "none",
+      transition: "0.3s ease"
+    }}
+  >
+    Create Resident Account
+  </Link>
+
+  <p
+    style={{
+      marginTop: "20px",
+      color: "gray",
+      fontSize: "14px"
+    }}
+  >
+    Powered by <strong>idamag.mo</strong> AI Assistance
+  </p>
+</div>
 
         </div>
 
