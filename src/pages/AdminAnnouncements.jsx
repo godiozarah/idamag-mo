@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import CommentsModal from "../components/CommentsModal";
 import {
   MdCampaign,
   MdPushPin,
@@ -15,20 +14,21 @@ import {
 import "./AdminAnnouncements.css";
 
 import AnnouncementPreview from "../components/AnnouncementPreview";
-import AnnouncementCard from "../components/AnnouncementCard";
 
 import { db, storage } from "../firebase";
 
 import {
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  serverTimestamp,
-  deleteDoc,
-  doc,
-  updateDoc,
+ collection,
+addDoc,
+query,
+orderBy,
+onSnapshot,
+serverTimestamp,
+deleteDoc,
+doc,
+updateDoc,
+getDocs,
+getDoc
 } from "firebase/firestore";
 
 import {
@@ -57,14 +57,22 @@ export default function AdminAnnouncements() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("All");
 
-  // Comments Modal
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
-  const [showCommentsModal, setShowCommentsModal] = useState(false);
-
   // Analytics Modal
   const [analyticsAnnouncement, setAnalyticsAnnouncement] = useState(null);
+  const [analyticsLikes, setAnalyticsLikes] = useState([]);
+  const [analyticsViews, setAnalyticsViews] = useState([]);
+    const publishedSectionRef = useRef(null);
+  // ==========================
+// COMMENTS
+// ==========================
 
-  const publishedSectionRef = useRef(null);
+const [comments, setComments] = useState({});
+
+const [replies, setReplies] = useState({});
+
+const [replyInputs, setReplyInputs] = useState({});
+
+const [activeReply, setActiveReply] = useState({});
 /* ===========================
    IMAGE
 =========================== */
@@ -76,15 +84,6 @@ const handleImageChange = (e) => {
 
   setImage(file);
   setImagePreview(URL.createObjectURL(file));
-};
-
-/* ===========================
-   COMMENTS
-=========================== */
-
-const handleComments = (announcement) => {
-  setSelectedAnnouncement(announcement);
-  setShowCommentsModal(true);
 };
 
 /* ===========================
@@ -307,7 +306,170 @@ const handlePin = async (announcement) => {
       console.error(error);
     }
   };
+/* ===========================
+   LOAD COMMENTS
+=========================== */
 
+function loadReplies(announcementId, commentId) {
+  const q = query(
+    collection(
+      db,
+      "announcements",
+      announcementId,
+      "comments",
+      commentId,
+      "replies"
+    ),
+    orderBy("createdAt", "asc")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    setReplies((prev) => ({
+      ...prev,
+      [commentId]: snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })),
+    }));
+  });
+}
+
+function loadComments(announcementId) {
+  const q = query(
+    collection(
+      db,
+      "announcements",
+      announcementId,
+      "comments"
+    ),
+    orderBy("createdAt", "asc")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setComments((prev) => ({
+      ...prev,
+      [announcementId]: data,
+    }));
+
+    data.forEach((comment) => {
+      loadReplies(
+        announcementId,
+        comment.id
+      );
+    });
+  });
+}
+useEffect(() => {
+  const unsubscribers = announcements.map((announcement) =>
+    loadComments(announcement.id)
+  );
+
+   return () => {
+    unsubscribers.forEach((unsubscribe) => {
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
+    });
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [announcements]);
+/* ===========================
+   REPLY TO COMMENT
+=========================== */
+
+const handleReply = async (announcementId, commentId) => {
+  const text = (replyInputs[commentId] || "").trim();
+
+  if (!text) return;
+
+  try {
+    await addDoc(
+      collection(
+        db,
+        "announcements",
+        announcementId,
+        "comments",
+        commentId,
+        "replies"
+      ),
+      {
+        text,
+        isAdmin: true,
+        createdAt: serverTimestamp(),
+      }
+    );
+
+    setReplyInputs((prev) => ({
+      ...prev,
+      [commentId]: "",
+    }));
+
+    setActiveReply((prev) => ({
+      ...prev,
+      [commentId]: false,
+    }));
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to send reply.");
+  }
+};
+const openAnalytics = async (announcement) => {
+  console.log("Opening analytics...");
+
+  setAnalyticsAnnouncement(announcement);
+
+  try {
+    const likesSnapshot = await getDocs(
+      collection(db, "announcements", announcement.id, "likes")
+    );
+
+    console.log("Likes:", likesSnapshot.size);
+
+    const viewsSnapshot = await getDocs(
+      collection(db, "announcements", announcement.id, "views")
+    );
+
+    console.log("Views:", viewsSnapshot.size);
+
+    const likes = await Promise.all(
+  likesSnapshot.docs.map(async (likeDoc) => {
+    const userSnap = await getDoc(
+      doc(db, "users", likeDoc.id)
+    );
+
+    return {
+      id: likeDoc.id,
+      ...(userSnap.exists() ? userSnap.data() : {}),
+    };
+  })
+);
+
+setAnalyticsLikes(likes);
+
+    const views = await Promise.all(
+  viewsSnapshot.docs.map(async (viewDoc) => {
+    const userSnap = await getDoc(
+      doc(db, "users", viewDoc.id)
+    );
+
+    return {
+      id: viewDoc.id,
+      ...(userSnap.exists() ? userSnap.data() : {}),
+    };
+  })
+);
+
+setAnalyticsViews(views);
+
+  } catch (error) {
+    console.error("Analytics Error:", error);
+  }
+};
   /* ===========================
      FILTERS
   ============================ */
@@ -617,8 +779,7 @@ const handlePin = async (announcement) => {
     />
 
   </div>
-  
- {/* ===========================
+{/* ===========================
     PUBLISHED ANNOUNCEMENTS
 =========================== */}
 
@@ -634,87 +795,238 @@ const handlePin = async (announcement) => {
 
   {filteredAnnouncements.length === 0 ? (
     <div className="empty-state">
-      <h3>No announcements found</h3>
-
-      <p>
-        Try changing the search or filter,
-        or create your first announcement.
-      </p>
+      <h3>No announcements found.</h3>
     </div>
   ) : (
     filteredAnnouncements.map((announcement) => (
       <div
         key={announcement.id}
-        className="announcement-wrapper"
+        className="announcement-card"
       >
-        <AnnouncementCard
-          title={announcement.title}
-          category={announcement.category}
-          content={announcement.content}
-          image={announcement.imageUrl}
-          date={
-            announcement.createdAt?.toDate
-              ? announcement.createdAt
-                  .toDate()
-                  .toLocaleDateString()
-              : "Just now"
-          }
-          likes={announcement.likes || 0}
-          comments={announcement.comments || 0}
-          views={announcement.views || 0}
-          pinned={announcement.isPinned}
-          onEdit={() => handleEdit(announcement)}
-          onDelete={() => handleDelete(announcement)}
-          onPin={() => handlePin(announcement)}
-          onComments={() => handleComments(announcement)}
-          onAnalytics={() =>
-            setAnalyticsAnnouncement(announcement)
-          }
-        />
+        {announcement.imageUrl && (
+          <img
+            src={announcement.imageUrl}
+            alt={announcement.title}
+            className="announcement-image"
+          />
+        )}
 
-        <div className="announcement-extra-actions">
-          {(announcement.status || "Published") ===
-          "Published" ? (
-            <button
-              className="archive-btn"
-              onClick={() =>
-                handleArchive(announcement)
+        <div className="announcement-content">
+
+          <div className="announcement-header">
+
+            <div>
+
+              <span className="category">
+                {announcement.category}
+              </span>
+
+              <h2>{announcement.title}</h2>
+
+            </div>
+
+            {announcement.isPinned && (
+              <span className="pinned-badge">
+                📌 Pinned
+              </span>
+            )}
+
+          </div>
+
+          <p>{announcement.content}</p>
+
+          <div className="announcement-actions">
+
+            <span>
+              ❤️ {announcement.likes || 0}
+            </span>
+
+            <span>
+              💬 {announcement.comments || 0}
+            </span>
+
+            <span>
+              👁 {announcement.views || 0}
+            </span>
+
+          </div>
+
+          {/* COMMENTS START HERE */}
+
+  {/* COMMENTS START HERE */}
+  <div className="comments-section">
+
+  {(comments[announcement.id] || []).length === 0 ? (
+    <p className="no-comments">
+      No comments yet.
+    </p>
+  ) : (
+    (comments[announcement.id] || []).map((comment) => (
+      <div
+        key={comment.id}
+        className="comment-card"
+      >
+        <div className="comment-header">
+
+          <strong>
+            {comment.residentNumber
+              ? `Resident #${String(
+                  comment.residentNumber
+                ).padStart(4, "0")}`
+              : "Resident"}
+          </strong>
+
+          <small>
+            {comment.createdAt?.toDate?.().toLocaleString()}
+          </small>
+
+        </div>
+
+        <p>{comment.text}</p>
+
+        {(replies[comment.id] || []).map((reply) => (
+          <div
+            key={reply.id}
+            className="reply-card"
+          >
+            <strong>
+              {reply.isAdmin
+                ? "✔ Barangay Ucab"
+                : reply.residentNumber
+                ? `Resident #${String(
+                    reply.residentNumber
+                  ).padStart(4, "0")}`
+                : "Resident"}
+            </strong>
+
+            <p>{reply.text}</p>
+          </div>
+        ))}
+
+        {activeReply[comment.id] ? (
+          <div className="reply-box">
+
+            <textarea
+              placeholder="Write a reply..."
+              value={
+                replyInputs[comment.id] || ""
               }
-            >
-              <MdArchive />
-              Archive
-            </button>
-          ) : (
-            <button
-              className="restore-btn"
-              onClick={() =>
-                handleRestore(announcement)
+              onChange={(e) =>
+                setReplyInputs((prev) => ({
+                  ...prev,
+                  [comment.id]: e.target.value,
+                }))
               }
-            >
-              <MdCampaign />
-              Restore
-            </button>
-          )}
+            />
+
+            <div className="reply-actions">
+
+              <button
+                className="send-reply-btn"
+                onClick={() =>
+                  handleReply(
+                    announcement.id,
+                    comment.id
+                  )
+                }
+              >
+                Send Reply
+              </button>
+
+              <button
+                className="cancel-reply-btn"
+                onClick={() =>
+                  setActiveReply((prev) => ({
+                    ...prev,
+                    [comment.id]: false,
+                  }))
+                }
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </div>
+        ) : (
+          <button
+            className="reply-btn"
+            onClick={() =>
+              setActiveReply((prev) => ({
+                ...prev,
+                [comment.id]: true,
+              }))
+            }
+          >
+            Reply
+          </button>
+        )}
+
+      </div>
+    ))
+  )}
+
+</div>
+
+{/* COMMENTS END HERE */}
+<div className="announcement-extra-actions">
+
+  <button
+    className="edit-btn"
+    onClick={() => handleEdit(announcement)}
+  >
+    Edit
+  </button>
+
+  <button
+    className="pin-btn"
+    onClick={() => handlePin(announcement)}
+  >
+    {announcement.isPinned ? "Unpin" : "Pin"}
+  </button>
+
+  <button
+  className="analytics-btn"
+  onClick={() => {
+    console.log("Analytics clicked");
+    openAnalytics(announcement);
+  }}
+>
+  Analytics
+</button>
+
+  {(announcement.status || "Published") === "Published" ? (
+    <>
+      <button
+        className="archive-btn"
+        onClick={() => handleArchive(announcement)}
+      >
+        Archive
+      </button>
+
+      <button
+        className="delete-btn"
+        onClick={() => handleDelete(announcement)}
+      >
+        Delete
+      </button>
+    </>
+  ) : (
+    <button
+      className="restore-btn"
+      onClick={() => handleRestore(announcement)}
+    >
+      Restore
+    </button>
+  )}
+
+</div>
+
         </div>
       </div>
     ))
   )}
 </div>
-
-{/* ===========================
-    COMMENTS MODAL
-=========================== */}
-
-{showCommentsModal && (
-  <CommentsModal
-    announcement={selectedAnnouncement}
-    onClose={() => {
-      setShowCommentsModal(false);
-      setSelectedAnnouncement(null);
-    }}
-  />
-)}
-
 {/* ===========================
     ANALYTICS MODAL
 =========================== */}
@@ -722,59 +1034,149 @@ const handlePin = async (announcement) => {
 {analyticsAnnouncement && (
   <div className="analytics-modal-overlay">
     <div className="analytics-modal">
-      <h2>📊 Announcement Analytics</h2>
 
-      <div className="analytics-item">
-        <strong>Title</strong>
-        <span>{analyticsAnnouncement.title}</span>
+      <div className="analytics-header">
+
+  <h2>📊 Announcement Analytics</h2>
+
+  <button
+    className="analytics-close"
+    onClick={() => setAnalyticsAnnouncement(null)}
+  >
+    &times;
+  </button>
+
+</div>
+
+      <div className="analytics-grid">
+
+        <div className="analytics-card">
+          <h4>Title</h4>
+          <p>{analyticsAnnouncement.title}</p>
+        </div>
+
+        <div className="analytics-card">
+          <h4>Category</h4>
+          <p>{analyticsAnnouncement.category}</p>
+        </div>
+
+        <div className="analytics-card">
+          <h4>Status</h4>
+          <p>
+            {analyticsAnnouncement.status || "Published"}
+          </p>
+        </div>
+
+        <div className="analytics-card">
+          <h4>Pinned</h4>
+          <p>
+            {analyticsAnnouncement.isPinned
+              ? "Yes"
+              : "No"}
+          </p>
+        </div>
+
+        <div className="analytics-card">
+          <h4>❤️ Likes</h4>
+          <h3>{analyticsAnnouncement.likes || 0}</h3>
+        </div>
+
+        <div className="analytics-card">
+          <h4>💬 Comments</h4>
+          <h3>{analyticsAnnouncement.comments || 0}</h3>
+        </div>
+
+        <div className="analytics-card">
+          <h4>👁 Views</h4>
+          <h3>{analyticsAnnouncement.views || 0}</h3>
+        </div>
+
       </div>
+{/* PEOPLE WHO LIKED */}
 
-      <div className="analytics-item">
-        <strong>Category</strong>
-        <span>{analyticsAnnouncement.category}</span>
-      </div>
+<div className="analytics-list">
 
-      <div className="analytics-item">
-        <strong>Likes</strong>
-        <span>{analyticsAnnouncement.likes || 0}</span>
-      </div>
+  <h3>❤️ Residents Who Liked</h3>
 
-      <div className="analytics-item">
-        <strong>Comments</strong>
-        <span>{analyticsAnnouncement.comments || 0}</span>
-      </div>
-
-      <div className="analytics-item">
-        <strong>Views</strong>
-        <span>{analyticsAnnouncement.views || 0}</span>
-      </div>
-
-      <div className="analytics-item">
-        <strong>Status</strong>
-        <span>
-          {analyticsAnnouncement.status || "Published"}
-        </span>
-      </div>
-
-      <div className="analytics-item">
-        <strong>Pinned</strong>
-        <span>
-          {analyticsAnnouncement.isPinned ? "Yes" : "No"}
-        </span>
-      </div>
-
-      <button
-        className="close-modal-btn"
-        onClick={() =>
-          setAnalyticsAnnouncement(null)
-        }
+  {analyticsLikes.length === 0 ? (
+    <p>No likes yet.</p>
+  ) : (
+    analyticsLikes.map((person) => (
+      <div
+        key={person.id}
+        className="analytics-person"
       >
-        Close
-      </button>
+        <img
+          src={person.avatar || "/default-avatar.png"}
+          alt="avatar"
+          className="analytics-avatar"
+        />
+
+        <div>
+          <strong>
+            Resident #
+            {String(
+              person.residentNumber || 0
+            ).padStart(4, "0")}
+          </strong>
+        </div>
+
+      </div>
+    ))
+  )}
+
+</div>
+
+{/* PEOPLE WHO VIEWED */}
+
+<div className="analytics-list">
+
+  <h3>👁 Residents Who Viewed</h3>
+
+  {analyticsViews.length === 0 ? (
+    <p>No views yet.</p>
+  ) : (
+    analyticsViews.map((person) => (
+      <div
+        key={person.id}
+        className="analytics-person"
+      >
+        <img
+          src={person.avatar || "/default-avatar.png"}
+          alt="avatar"
+          className="analytics-avatar"
+        />
+
+        <div>
+          <strong>
+            Resident #
+            {String(
+              person.residentNumber || 0
+            ).padStart(4, "0")}
+          </strong>
+        </div>
+
+      </div>
+    ))
+  )}
+
+</div>
+      <div className="analytics-actions">
+
+        <button
+          className="close-modal-btn"
+          onClick={() =>
+            setAnalyticsAnnouncement(null)
+          }
+        >
+          Close
+        </button>
+
+      </div>
+
     </div>
   </div>
-)}
-
+)}  
 </div>
 );
 }

@@ -57,7 +57,7 @@ export default function Reports() {
 
   const [statusFilter, setStatusFilter] = useState("All");
 
-  
+  const [userProfiles, setUserProfiles] = useState({});
 
 
   // ADMIN EMAIL
@@ -105,6 +105,39 @@ useEffect(() => {
   return () => unsubscribe();
 
 }, []);
+useEffect(() => {
+
+  const loadProfiles = async () => {
+
+    const profiles = {};
+
+    for (const report of reports) {
+
+      if (!report.userId) continue;
+
+      if (profiles[report.userId]) continue;
+
+      const snap = await getDoc(
+        doc(db, "users", report.userId)
+      );
+
+      if (snap.exists()) {
+
+        profiles[report.userId] = snap.data();
+
+      }
+
+    }
+
+    setUserProfiles(profiles);
+
+  };
+
+  if (reports.length) {
+    loadProfiles();
+  }
+
+}, [reports]);
 
 
 
@@ -544,35 +577,21 @@ await addDoc(collection(db, "reports"), {
     <div className="container-fluid py-4 bg-light min-vh-100">
 
 
-      {/* ==========================
-          HEADER
-      ========================== */}
+{/* ==========================
+    HEADER
+========================== */}
 
+<div className="mb-4">
 
-      <div className="mb-4">
+  <h1 className="fw-bold text-success">
+    Resident Reports
+  </h1>
 
+  <p className="text-muted">
+    Submit concerns and monitor barangay responses.
+  </p>
 
-        <h1
-          className="fw-bold text-success"
-        >
-
-          Resident Reports
-
-        </h1>
-
-
-        <p className="text-muted">
-
-          Submit concerns and monitor barangay responses.
-
-        </p>
-
-
-      </div>
-
-
-
-
+</div>
 
       {
       
@@ -797,299 +816,170 @@ await addDoc(collection(db, "reports"), {
 
 
 
+{/* ==========================
+    SUBMIT REPORT FORM
+========================== */}
 
-      {/* ==========================
-          SUBMIT REPORT FORM
-      ========================== */}
+<div className="card shadow-sm border-0 mb-4">
 
+  <div className="card-body p-4">
 
+    <h4 className="fw-bold text-success mb-4">
+      Submit New Report
+    </h4>
 
-      <div className="card shadow-sm border-0 mb-4">
+    <div className="row g-3">
 
+      {/* REPORT TITLE */}
 
-        <div className="card-body p-4">
+      <div className="col-12">
 
+        <label className="form-label fw-semibold">
+          Report Title
+        </label>
 
-          <h4
-            className="fw-bold text-success mb-4"
-          >
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Example: Broken street light"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-            Submit New Report
+      </div>
 
-          </h4>
+      {/* CATEGORY */}
 
+      <div className="col-12 col-md-6">
 
+        <label className="form-label fw-semibold">
+          Category
+        </label>
 
+        <select
+          className="form-select"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
 
-          <div className="row g-3">
+          <option value="">Select Category</option>
+          <option value="Damaged Infrastructure">
+            Damaged Infrastructure
+          </option>
+          <option value="Waste Management">
+            Waste Management
+          </option>
+          <option value="Drainage Problems">
+            Drainage Problems
+          </option>
+          <option value="Street Lighting">
+            Street Lighting
+          </option>
+          <option value="Public Safety">
+            Public Safety
+          </option>
+          <option value="Others">
+            Others
+          </option>
 
+        </select>
 
+      </div>
 
-            <div className="col-12">
+      {/* DESCRIPTION */}
 
+      <div className="col-12">
 
-              <label className="form-label fw-semibold">
+        <label className="form-label fw-semibold">
+          Description
+        </label>
 
-                Report Title
+        <textarea
+          className="form-control"
+          rows="5"
+          placeholder="Describe your concern..."
+          value={concern}
+          onChange={(e) => setConcern(e.target.value)}
+        />
 
-              </label>
+      </div>
 
+      {/* IMAGE UPLOAD */}
 
-              <input
+      <div className="col-12">
 
-                type="text"
+        <label className="form-label fw-semibold">
+          Attach Image (Optional)
+        </label>
 
-                className="form-control"
+        <input
+          type="file"
+          className="form-control"
+          accept="image/*"
+          onChange={(e) => {
 
-                placeholder="Example: Broken street light"
+            const file = e.target.files[0];
 
-                value={title}
+            setImage(file);
 
-                onChange={(e)=>
-                  setTitle(e.target.value)
-                }
+            if (file) {
 
-              />
+              setImagePreview(
+                URL.createObjectURL(file)
+              );
 
+            }
 
-            </div>
+          }}
+        />
 
+      </div>
 
+      {/* IMAGE PREVIEW */}
 
+      {imagePreview && (
 
+        <div className="col-12">
 
-            <div className="col-12 col-md-6">
+          <label className="form-label fw-semibold">
+            Image Preview
+          </label>
 
+          <img
+            src={imagePreview}
+            alt="Preview"
+            className="img-fluid rounded shadow-sm"
+            style={{
+              maxHeight: "250px"
+            }}
+          />
 
-              <label className="form-label fw-semibold">
+        </div>
 
-                Category
+      )}
 
-              </label>
+      {/* SUBMIT BUTTON */}
 
+      <div className="col-12">
 
-<select
-  className="form-select"
-  value={category}
-  onChange={(e)=>
-    setCategory(e.target.value)
-  }
->
+        <button
+          className="btn btn-success px-4"
+          onClick={submitReport}
+        >
 
-  <option value="">
-    Select Category
-  </option>
+          <FaPaperPlane className="me-2" />
 
-  <option value="Damaged Infrastructure">
-    Damaged Infrastructure
-  </option>
+          Submit Report
 
-  <option value="Waste Management">
-    Waste Management
-  </option>
+        </button>
 
-  <option value="Drainage Problems">
-    Drainage Problems
-  </option>
-
-  <option value="Street Lighting">
-    Street Lighting
-  </option>
-
-  <option value="Public Safety">
-    Public Safety
-  </option>
-
-  <option value="Others">
-    Others
-  </option>
-
-</select>
-
-
-            </div>
-
-
-
-
-
-            <div className="col-12">
-
-
-              <label className="form-label fw-semibold">
-
-                Description
-
-              </label>
-
-
-
-              <textarea
-
-                className="form-control"
-
-                rows="5"
-
-                placeholder="Describe your concern..."
-
-                value={concern}
-
-                onChange={(e)=>
-                  setConcern(
-                    e.target.value
-                  )
-                }
-
-              />
-              {/* IMAGE UPLOAD */}
-                
-
-<div className="col-12 mt-3">
-
-  <label className="form-label fw-semibold">
-    Attach Image (Optional)
-  </label>
-
-
-  <input
-
-    type="file"
-
-    className="form-control"
-
-    accept="image/*"
-
-    onChange={(e)=>{
-
-      const file =
-        e.target.files[0];
-
-
-      setImage(file);
-
-
-      if(file){
-
-        setImagePreview(
-          URL.createObjectURL(file)
-        );
-
-      }
-
-    }}
-
-  />
-
-</div>
-
-
-
-{/* IMAGE PREVIEW */}
-
-{imagePreview && (
-
-  <div className="col-12 mt-3">
-
-    <label className="form-label fw-semibold">
-      Image Preview
-    </label>
-
-
-    <div>
-
-      <img
-
-        src={imagePreview}
-
-        alt="Preview"
-
-        className="img-fluid rounded shadow-sm"
-
-        style={{
-          maxHeight:"250px"
-        }}
-
-      />
+      </div>
 
     </div>
 
   </div>
 
-)}
-              <div className="col-12">
-
-<label className="form-label fw-semibold">
- Report Image (Optional)
-</label>
-
-
-<input
-
-type="file"
-
-className="form-control"
-
-accept="image/*"
-
-onChange={(e)=>{
-
- const file = e.target.files[0];
-
- setImage(file);
-
-
- if(file){
-
- setImagePreview(
- URL.createObjectURL(file)
- );
-
- }
-
-}}
-
-/>
-
 </div>
-
-
-
-            </div>
-
-
-
-
-            <div className="col-12">
-
-
-              <button
-
-                className="btn btn-success px-4"
-
-                onClick={submitReport}
-
-              >
-
-                <FaPaperPlane className="me-2"/>
-
-                Submit Report
-
-
-              </button>
-
-
-
-            </div>
-
-
-
-          </div>
-
-
-        </div>
-
-
-      </div>
       {/* ==========================
           SEARCH AND FILTER
       ========================== */}
@@ -1389,39 +1279,40 @@ onChange={(e)=>{
 
 
 
-                {/* REPORT INFORMATION */}
+               <div className="d-flex align-items-center mb-3">
 
+  <img
+    src={`/${userProfiles[report.userId]?.avatar || "avatar1.png"}`}
+    alt="Avatar"
+    style={{
+      width: "50px",
+      height: "50px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      marginRight: "15px",
+      border: "2px solid #198754",
+    }}
+  />
 
+  <div>
 
-                <div className="mb-3">
+    <div className="fw-bold">
+      Resident #{String(report.residentNumber || 0).padStart(4, "0")}
+    </div>
 
+    <small className="text-muted">
+      {report.reporterEmail}
+    </small>
 
-                  <p className="text-muted mb-2">
+    <br />
 
+    <small className="text-muted">
+      {formatDate(report.createdAt)}
+    </small>
 
-                    <strong>Reporter:</strong>{" "}
+  </div>
 
-                   Resident #{String(report.residentNumber || 0).padStart(4, "0")}
-
-                  </p>
-
-
-
-                  <p className="text-muted mb-3">
-
-
-                    <strong>Date:</strong>{" "}
-
-                    {formatDate(
-                      report.createdAt
-                    )}
-
-
-                  </p>
-
-
-
-                </div>
+</div>
 
 
 

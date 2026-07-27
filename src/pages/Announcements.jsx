@@ -32,46 +32,54 @@ export default function Announcements() {
   // LIKE
   // ==========================
 
-  async function handleLike(announcementId) {
-    try {
-      const user = auth.currentUser;
+ async function handleLike(announcementId) {
+  try {
+    const user = auth.currentUser;
 
-      if (!user) {
-        alert("Please log in first.");
-        return;
-      }
-
-      const likeRef = doc(
-        db,
-        "announcements",
-        announcementId,
-        "likes",
-        user.uid
-      );
-
-      const likeSnap = await getDoc(likeRef);
-
-      if (likeSnap.exists()) {
-        alert("You already liked this announcement.");
-        return;
-      }
-
-      await setDoc(likeRef, {
-        liked: true,
-        createdAt: serverTimestamp(),
-      });
-
-      await updateDoc(
-        doc(db, "announcements", announcementId),
-        {
-          likes: increment(1),
-        }
-      );
-    } catch (error) {
-      console.error("Like Error:", error);
+    if (!user) {
+      alert("Please log in first.");
+      return;
     }
-  }
 
+    const likeRef = doc(
+      db,
+      "announcements",
+      announcementId,
+      "likes",
+      user.uid
+    );
+
+    const likeSnap = await getDoc(likeRef);
+
+    if (likeSnap.exists()) {
+      alert("You already liked this announcement.");
+      return;
+    }
+
+    const userSnap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    const userData = userSnap.data();
+
+    await setDoc(likeRef, {
+      liked: true,
+      residentNumber: userData.residentNumber,
+      avatar: userData.avatar,
+      createdAt: serverTimestamp(),
+    });
+
+    await updateDoc(
+      doc(db, "announcements", announcementId),
+      {
+        likes: increment(1),
+      }
+    );
+
+  } catch (error) {
+    console.error("Like Error:", error);
+  }
+}
   // ==========================
   // VIEW
   // ==========================
@@ -94,10 +102,18 @@ export default function Announcements() {
 
       if (viewSnap.exists()) return;
 
-      await setDoc(viewRef, {
-        viewed: true,
-        createdAt: serverTimestamp(),
-      });
+      const userSnap = await getDoc(
+  doc(db, "users", user.uid)
+);
+
+const userData = userSnap.data();
+
+await setDoc(viewRef, {
+  viewed: true,
+  residentNumber: userData.residentNumber,
+  avatar: userData.avatar,
+  createdAt: serverTimestamp(),
+});
 
       await updateDoc(
         doc(db, "announcements", announcementId),
@@ -186,21 +202,28 @@ export default function Announcements() {
 
       const text = commentInputs[announcementId]?.trim();
 
-      if (!text) return;
+if (!text) return;
 
-      await addDoc(
-        collection(
-          db,
-          "announcements",
-          announcementId,
-          "comments"
-        ),
-        {
-          author: user.displayName || user.email,
-          text,
-          createdAt: serverTimestamp(),
-        }
-      );
+const userSnap = await getDoc(
+  doc(db, "users", user.uid)
+);
+
+const userData = userSnap.data();
+await addDoc(
+  collection(
+    db,
+    "announcements",
+    announcementId,
+    "comments"
+  ),
+  {
+    userId: user.uid,
+    residentNumber: userData.residentNumber,
+    avatar: userData.avatar,
+    text,
+    createdAt: serverTimestamp(),
+  }
+);
 
       await updateDoc(
         doc(db, "announcements", announcementId),
@@ -217,59 +240,69 @@ export default function Announcements() {
       console.error("Comment Error:", error);
     }
   }
+// ==========================
+// POST REPLY
+// ==========================
 
-  // ==========================
-  // POST REPLY
-  // ==========================
+async function handleReply(
+  announcementId,
+  commentId
+) {
+  try {
+    const user = auth.currentUser;
 
-  async function handleReply(
-    announcementId,
-    commentId
-  ) {
-    try {
-      const user = auth.currentUser;
-
-      if (!user) {
-        alert("Please log in first.");
-        return;
-      }
-
-      const text =
-        replyInputs[commentId]?.trim();
-
-      if (!text) return;
-
-      await addDoc(
-        collection(
-          db,
-          "announcements",
-          announcementId,
-          "comments",
-          commentId,
-          "replies"
-        ),
-        {
-          author:
-            user.displayName || user.email,
-          text,
-          isAdmin: false,
-          createdAt: serverTimestamp(),
-        }
-      );
-
-      setReplyInputs((prev) => ({
-        ...prev,
-        [commentId]: "",
-      }));
-
-      setActiveReply((prev) => ({
-        ...prev,
-        [commentId]: false,
-      }));
-    } catch (error) {
-      console.error("Reply Error:", error);
+    if (!user) {
+      alert("Please log in first.");
+      return;
     }
-  }  useEffect(() => {
+
+    const text = replyInputs[commentId]?.trim();
+
+    if (!text) return;
+
+    // Get resident information
+    const userSnap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    const userData = userSnap.data();
+
+    // Save reply
+    await addDoc(
+      collection(
+        db,
+        "announcements",
+        announcementId,
+        "comments",
+        commentId,
+        "replies"
+      ),
+      {
+        userId: user.uid,
+        residentNumber: userData.residentNumber,
+        avatar: userData.avatar,
+        text,
+        isAdmin: false,
+        createdAt: serverTimestamp(),
+      }
+    );
+
+    setReplyInputs((prev) => ({
+      ...prev,
+      [commentId]: "",
+    }));
+
+    setActiveReply((prev) => ({
+      ...prev,
+      [commentId]: false,
+    }));
+
+  } catch (error) {
+    console.error("Reply Error:", error);
+  }
+}
+
+useEffect(() => {
     const q = query(
       collection(db, "announcements"),
       orderBy("createdAt", "desc")
@@ -357,17 +390,46 @@ export default function Announcements() {
                           className="comment-card"
                         >
                           <div className="comment-header">
-                            <strong>
-                              {comment.author}
-                            </strong>
+                            <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  }}
+>
 
-                            <small>
-                              {comment.createdAt?.toDate
-                                ? comment.createdAt
-                                    .toDate()
-                                    .toLocaleString()
-                                : "Just now"}
-                            </small>
+  <img
+    src={`/${comment.avatar || "avatar1.png"}`}
+    alt="Avatar"
+    style={{
+      width: "40px",
+      height: "40px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      border: "2px solid #198754",
+    }}
+  />
+
+  <div>
+
+    <strong>
+      Resident #
+      {String(comment.residentNumber || 0).padStart(4, "0")}
+    </strong>
+
+    <br />
+
+    <small>
+      {comment.createdAt?.toDate
+        ? comment.createdAt
+            .toDate()
+            .toLocaleString()
+        : "Just now"}
+    </small>
+
+  </div>
+
+</div>
                           </div>
 
                           <p>{comment.text}</p>
@@ -432,11 +494,39 @@ export default function Announcements() {
                                 key={reply.id}
                                 className="admin-reply"
                               >
-                                <strong>
-                                  {reply.isAdmin
-                                    ? "✔ Barangay Ucab"
-                                    : reply.author}
-                                </strong>
+                                <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  }}
+>
+
+  {!reply.isAdmin && (
+
+    <img
+      src={`/${reply.avatar || "avatar1.png"}`}
+      alt="Avatar"
+      style={{
+        width: "35px",
+        height: "35px",
+        borderRadius: "50%",
+      }}
+    />
+
+  )}
+
+  <strong>
+
+    {reply.isAdmin
+      ? "✔ Barangay Ucab"
+      : `Resident #${String(
+          reply.residentNumber || 0
+        ).padStart(4, "0")}`}
+
+  </strong>
+
+</div>
 
                                 <p>{reply.text}</p>
 

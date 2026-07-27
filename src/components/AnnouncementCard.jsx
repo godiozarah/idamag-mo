@@ -6,9 +6,9 @@ import {
   MdDelete,
   MdPushPin,
   MdAnalytics,
-  MdForum,
 } from "react-icons/md";
 
+import barangaySeal from "../assets/barangayseal.png";
 import "./AnnouncementCard.css";
 
 export default function AnnouncementCard({
@@ -25,19 +25,28 @@ export default function AnnouncementCard({
   onDelete,
   onPin,
   onAnalytics,
-  onComments,
 }) {
   return (
     <div className="announcement-card">
-      {image && (
-        <img
-          src={image}
-          alt={title}
-          className="announcement-image"
-        />
-      )}
-
       <div className="announcement-body">
+
+        {/* OFFICIAL HEADER */}
+        <div className="announcement-author">
+          <img
+            src={barangaySeal}
+            alt="Barangay Ucab"
+            className="announcement-avatar"
+          />
+
+          <div>
+            <h4>Barangay Ucab</h4>
+            <small>Official Announcement</small>
+            <br />
+            <small>{date}</small>
+          </div>
+        </div>
+
+        {/* PINNED */}
         {pinned && (
           <div className="announcement-pin">
             <MdPushPin />
@@ -45,6 +54,7 @@ export default function AnnouncementCard({
           </div>
         )}
 
+        {/* CATEGORY */}
         <span
           className={`announcement-category ${
             category ? category.toLowerCase() : ""
@@ -53,12 +63,24 @@ export default function AnnouncementCard({
           {category}
         </span>
 
+        {/* TITLE */}
         <h3>{title}</h3>
 
-        <p className="announcement-date">{date}</p>
+        {/* CONTENT */}
+        <p className="announcement-content">
+          {content}
+        </p>
 
-        <p className="announcement-content">{content}</p>
+        {/* IMAGE */}
+        {image && (
+          <img
+            src={image}
+            alt={title}
+            className="announcement-image"
+          />
+        )}
 
+        {/* STATS */}
         <div className="announcement-stats">
           <div>
             <MdThumbUp />
@@ -76,6 +98,7 @@ export default function AnnouncementCard({
           </div>
         </div>
 
+        {/* ACTION BUTTONS */}
         <div className="announcement-actions">
           <button
             className="edit-btn"
@@ -96,15 +119,6 @@ export default function AnnouncementCard({
           </button>
 
           <button
-            className="comments-btn"
-            onClick={onComments}
-            type="button"
-          >
-            <MdForum />
-            Comments
-          </button>
-
-          <button
             className="analytics-btn"
             onClick={onAnalytics}
             type="button"
@@ -122,6 +136,7 @@ export default function AnnouncementCard({
             Delete
           </button>
         </div>
+
       </div>
     </div>
   );

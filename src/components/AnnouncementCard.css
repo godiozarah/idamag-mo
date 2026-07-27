@@ -262,3 +262,54 @@
     color:#666;
     font-size:12px;
 }
+.announcement-author{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.announcement-avatar{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #2E7D32;
+}
+
+.announcement-author h4{
+    margin:0;
+    color:#1B5E20;
+    font-size:18px;
+}
+
+.announcement-author small{
+    color:#777;
+}
+.announcement-author{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.announcement-avatar{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #2E7D32;
+    background:white;
+}
+
+.announcement-author h4{
+    margin:0;
+    color:#1B5E20;
+    font-size:18px;
+    font-weight:700;
+}
+
+.announcement-author small{
+    color:#777;
+    font-size:13px;
+}
