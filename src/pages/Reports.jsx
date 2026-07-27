@@ -176,13 +176,17 @@ imageRef
 
 
      const userDoc = await getDoc(doc(db, "users", user.uid));
+     console.log("Logged in UID:", user.uid);
+console.log("Document exists:", userDoc.exists());
+
+const userData = userDoc.data();
+console.log("User data:", userData);
+console.log("Resident Number:", userData?.residentNumber);
 
 if (!userDoc.exists()) {
   alert("User profile not found.");
   return;
 }
-
-const userData = userDoc.data();
 
 await addDoc(collection(db, "reports"), {
   title,
