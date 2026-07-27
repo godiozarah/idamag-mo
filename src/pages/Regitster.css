@@ -5,104 +5,45 @@
     align-items:center;
     background:linear-gradient(to right,#1B5E20,#43A047);
     padding:20px;
-    box-sizing:border-box;
 }
 
 .register-card{
     width:100%;
     max-width:1000px;
-    background:#fff;
+    background:white;
     border-radius:25px;
     overflow:hidden;
     display:flex;
-    box-shadow:0 10px 40px rgba(0,0,0,.25);
 }
 
 .register-left,
 .register-right{
     flex:1;
-    padding:60px 50px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+    padding:60px 40px;
 }
 
-.register-left{
-    background:linear-gradient(to bottom right,#1B5E20,#43A047);
-    color:white;
-}
-
-.register-logo{
-    width:120px;
-    margin-bottom:25px;
-}
-
-.register-title{
-    font-size:48px;
-    font-weight:bold;
-    margin-bottom:15px;
-}
-
-.register-right h2{
-    font-size:40px;
-    color:#1B5E20;
-    text-align:center;
-}
-
-.register-right input{
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    border:1px solid #ccc;
-    box-sizing:border-box;
-    font-size:16px;
-}
-
-.register-right button{
-    width:100%;
-    padding:15px;
-    background:#1B5E20;
-    color:white;
-    border:none;
-    border-radius:12px;
-    font-size:17px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-@media (max-width:768px){
-
-.register-page{
-    padding:15px;
-    align-items:flex-start;
-}
+/* PHONE */
+@media screen and (max-width:768px){
 
 .register-card{
-    flex-direction:column;
+    flex-direction:column !important;
 }
 
 .register-left,
 .register-right{
-    padding:35px 25px;
+    width:100%;
+    padding:30px 20px;
+}
+
+.register-title{
+    font-size:36px !important;
+    text-align:center;
 }
 
 .register-logo{
     width:80px;
-    margin:auto;
-    margin-bottom:20px;
-}
-
-.register-title{
-    font-size:34px;
-    text-align:center;
-}
-
-.register-left p{
-    text-align:center;
-}
-
-.register-right h2{
-    font-size:30px;
+    display:block;
+    margin:0 auto 20px;
 }
 
 }
