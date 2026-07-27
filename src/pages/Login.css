@@ -1,0 +1,127 @@
+.login-page{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(to right,#1B5E20,#43A047);
+    padding:20px;
+    overflow-x:hidden;
+    box-sizing:border-box;
+}
+
+.login-card{
+    width:100%;
+    max-width:1000px;
+    background:#fff;
+    border-radius:25px;
+    overflow:hidden;
+    display:flex;
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
+}
+
+.login-left,
+.login-right{
+    flex:1;
+    padding:60px 50px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.login-left{
+    background:linear-gradient(to bottom right,#1B5E20,#43A047);
+    color:white;
+}
+
+.login-logo{
+    width:120px;
+    margin-bottom:25px;
+}
+
+.login-title{
+    font-size:48px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.register-btn{
+    display:block;
+    width:100%;
+    padding:14px;
+    background:white;
+    color:#1B5E20;
+    border:2px solid #1B5E20;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+    text-decoration:none;
+    text-align:center;
+    box-sizing:border-box;
+}
+
+.login-right h2{
+    font-size:40px;
+    color:#1B5E20;
+    text-align:center;
+}
+
+.login-right input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:12px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+.login-right button{
+    width:100%;
+    padding:15px;
+    background:#1B5E20;
+    color:white;
+    border:none;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:bold;
+}
+
+/* ---------- PHONE ---------- */
+
+@media (max-width:768px){
+
+.login-page{
+    padding:15px;
+    align-items:flex-start;
+}
+
+.login-card{
+    flex-direction:column;
+    border-radius:20px;
+}
+
+.login-left,
+.login-right{
+    width:100%;
+    padding:35px 25px;
+}
+
+.login-logo{
+    width:80px;
+    margin:auto;
+    margin-bottom:20px;
+}
+
+.login-title{
+    text-align:center;
+    font-size:34px;
+}
+
+.login-right h2{
+    font-size:30px;
+}
+
+.register-btn{
+    width:100%;
+}
+
+}
