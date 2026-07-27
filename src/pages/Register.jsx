@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import "./Register.css";
 import {
   createUserWithEmailAndPassword
 } from "firebase/auth";
@@ -129,60 +129,19 @@ await setDoc(doc(db, "users", user.uid), {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background:
-          "linear-gradient(to right, rgba(27,94,32,0.9), rgba(46,125,50,0.9))",
-        padding: "20px"
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1000px",
-          backgroundColor: "white",
-          borderRadius: "25px",
-          overflow: "hidden",
-          display: "flex",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.25)"
-        }}
-      >
-
+    <div className="register-page">
+      <div className="register-card">
         {/* LEFT SIDE */}
-        <div
-          style={{
-            flex: 1,
-            background:
-              "linear-gradient(to bottom right, #1B5E20, #43A047)",
-            color: "white",
-            padding: "60px 40px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center"
-          }}
-        >
+        <div className="register-left">
           <img
-            src="/icons.svg"
-            alt="Barangay Logo"
-            style={{
-              width: "120px",
-              marginBottom: "25px"
-            }}
-          />
+  src="/icons.svg"
+  alt="Barangay Logo"
+  className="register-logo"
+/>
 
-          <h1
-            style={{
-              fontSize: "48px",
-              marginBottom: "15px",
-              fontWeight: "bold"
-            }}
-          >
-            Join Barangay Ucab
-          </h1>
+          <h1 className="register-title">
+  Join Barangay Ucab
+</h1>
 
           <p
             style={{
@@ -197,15 +156,7 @@ await setDoc(doc(db, "users", user.uid), {
         </div>
 
         {/* RIGHT SIDE */}
-        <div
-          style={{
-            flex: 1,
-            padding: "60px 50px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center"
-          }}
-        >
+        <div className="register-right">
 
           <h2
             style={{
