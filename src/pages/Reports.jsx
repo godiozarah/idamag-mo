@@ -7,6 +7,9 @@ import {
   getDoc,
   onSnapshot,
   deleteDoc,
+  updateDoc,
+  setDoc,
+  increment,
 } from "firebase/firestore";
 
 import { auth, db, storage } from "../firebase";
@@ -180,32 +183,47 @@ imageRef
 console.log("Document exists:", userDoc.exists());
 
 const userData = userDoc.data();
-console.log("User data:", userData);
-console.log("Resident Number:", userData?.residentNumber);
 
-if (!userDoc.exists()) {
-  alert("User profile not found.");
-  return;
+let residentNumber = userData.residentNumber;
+
+// If this is an old account with no resident number
+if (residentNumber === undefined) {
+  const counterRef = doc(db, "counters", "residentCounter");
+  const counterSnap = await getDoc(counterRef);
+
+  if (counterSnap.exists()) {
+    residentNumber = counterSnap.data().current + 1;
+
+    await updateDoc(counterRef, {
+      current: increment(1),
+    });
+  } else {
+    residentNumber = 1;
+
+    await setDoc(counterRef, {
+      current: 1,
+    });
+  }
+
+  // Save the generated resident number to the user document
+  await updateDoc(doc(db, "users", user.uid), {
+    residentNumber,
+  });
 }
 
 await addDoc(collection(db, "reports"), {
   title,
   category,
   concern,
-
   status: "Pending",
-
   adminSolution: "",
   imageUrl,
 
-  residentNumber: userData.residentNumber,
+  residentNumber,
   reporterEmail: user.email,
-
   userId: user.uid,
-
   createdAt: serverTimestamp(),
 });
-
       setTitle("");
 
       setCategory("");
