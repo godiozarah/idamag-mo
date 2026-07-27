@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import "./Login.css";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 import {
@@ -105,245 +105,224 @@ export default function Login() {
   };
 
   return (
+  <div
+    style={{
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background:
+        "linear-gradient(to right, rgba(27,94,32,0.9), rgba(46,125,50,0.9))",
+      padding: "20px",
+      boxSizing: "border-box",
+    }}
+  >
     <div
       style={{
-        minHeight: "100vh",
+        width: "100%",
+        maxWidth: "1000px",
+        backgroundColor: "white",
+        borderRadius: "25px",
+        overflow: "hidden",
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background:
-          "linear-gradient(to right, rgba(27,94,32,0.9), rgba(46,125,50,0.9))",
-        padding: "20px"
+        flexDirection: window.innerWidth <= 768 ? "column" : "row",
+        boxShadow: "0 10px 40px rgba(0,0,0,0.25)",
       }}
     >
+      {/* LEFT SIDE */}
       <div
         style={{
-          width: "100%",
-          maxWidth: "1000px",
-          backgroundColor: "white",
-          borderRadius: "25px",
-          overflow: "hidden",
+          flex: 1,
+          background:
+            "linear-gradient(to bottom right, #1B5E20, #43A047)",
+          color: "white",
+          padding: window.innerWidth <= 768 ? "35px 25px" : "60px 40px",
           display: "flex",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.25)"
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
         }}
       >
-
-        {/* LEFT SIDE */}
-
-        <div
+        <img
+          src="/icons.svg"
+          alt="Barangay Logo"
           style={{
-            flex: 1,
-            background:
-              "linear-gradient(to bottom right, #1B5E20, #43A047)",
-            color: "white",
-            padding: "60px 40px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center"
+            width: window.innerWidth <= 768 ? "80px" : "120px",
+            marginBottom: "20px",
+          }}
+        />
+
+        <h1
+          style={{
+            fontSize: window.innerWidth <= 768 ? "36px" : "48px",
+            fontWeight: "bold",
+            marginBottom: "15px",
           }}
         >
-          <img
-            src="/icons.svg"
-            alt="Barangay Logo"
-            style={{
-              width: "120px",
-              marginBottom: "25px"
-            }}
-          />
+          Barangay Ucab
+        </h1>
 
-          <h1
-            style={{
-              fontSize: "48px",
-              marginBottom: "15px",
-              fontWeight: "bold"
-            }}
-          >
-            Barangay Ucab
-          </h1>
-
-          <div
-  style={{
-    marginTop: "25px",
-    textAlign: "center"
-  }}
->
-  <p
-    style={{
-      color: "gray",
-      marginBottom: "15px"
-    }}
-  >
-    Don't have an account?
-  </p>
-
-  <Link
-    to="/register"
-    style={{
-      display: "inline-block",
-      width: "100%",
-      padding: "14px",
-      backgroundColor: "white",
-      color: "#1B5E20",
-      border: "2px solid #1B5E20",
-      borderRadius: "12px",
-      fontSize: "16px",
-      fontWeight: "bold",
-      textDecoration: "none",
-      transition: "0.3s ease"
-    }}
-  >
-    Create Resident Account
-  </Link>
-
-  <p
-    style={{
-      marginTop: "20px",
-      color: "gray",
-      fontSize: "14px"
-    }}
-  >
-    Powered by <strong>idamag.mo</strong> AI Assistance
-  </p>
-</div>
-
-        </div>
-
-        {/* RIGHT SIDE */}
-
-        <div
+        <p
           style={{
-            flex: 1,
-            padding: "60px 50px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center"
+            color: "#ddd",
+            marginBottom: "15px",
           }}
         >
+          Don't have an account?
+        </p>
 
-          <h2
-            style={{
-              fontSize: "40px",
-              color: "#1B5E20",
-              marginBottom: "10px",
-              textAlign: "center"
-            }}
-          >
-            Welcome Back
-          </h2>
+        <Link
+          to="/register"
+          style={{
+            display: "block",
+            width: "100%",
+            maxWidth: "320px",
+            padding: "15px",
+            backgroundColor: "white",
+            color: "#1B5E20",
+            border: "2px solid #1B5E20",
+            borderRadius: "12px",
+            fontWeight: "bold",
+            textDecoration: "none",
+            boxSizing: "border-box",
+            textAlign: "center",
+          }}
+        >
+          Create Resident Account
+        </Link>
 
-          <p
-            style={{
-              color: "gray",
-              marginBottom: "35px",
-              textAlign: "center"
-            }}
-          >
-            Login to continue to your barangay portal.
-          </p>
-
-          <form
-            onSubmit={handleLogin}
-            style={{
-              width: "100%"
-            }}
-          >            <div style={{ marginBottom: "20px" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                  color: "#1B5E20"
-                }}
-              >
-                Email Address
-              </label>
-
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  borderRadius: "12px",
-                  border: "1px solid #ccc",
-                  fontSize: "16px",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }}
-                required
-              />
-            </div>
-
-            <div style={{ marginBottom: "25px" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                  color: "#1B5E20"
-                }}
-              >
-                Password
-              </label>
-
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  borderRadius: "12px",
-                  border: "1px solid #ccc",
-                  fontSize: "16px",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "15px",
-                backgroundColor: "#1B5E20",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "17px",
-                fontWeight: "bold",
-                cursor: "pointer"
-              }}
-            >
-              Login
-            </button>
-
-          </form>
-
-          <p
-            style={{
-              marginTop: "25px",
-              textAlign: "center",
-              color: "gray"
-            }}
-          >
-            Powered by idamag.mo AI Assistance
-          </p>
-
-        </div>
-
+        <p
+          style={{
+            marginTop: "25px",
+            color: "#ddd",
+            fontSize: "14px",
+          }}
+        >
+          Powered by <strong>idamag.mo</strong> AI Assistance
+        </p>
       </div>
 
-    </div>
-  );
+      {/* RIGHT SIDE */}
+      <div
+        style={{
+          flex: 1,
+          padding: window.innerWidth <= 768 ? "35px 25px" : "60px 50px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: window.innerWidth <= 768 ? "30px" : "40px",
+            color: "#1B5E20",
+            marginBottom: "10px",
+            textAlign: "center",
+          }}
+        >
+          Welcome Back
+        </h2>
 
+        <p
+          style={{
+            color: "gray",
+            marginBottom: "35px",
+            textAlign: "center",
+          }}
+        >
+          Login to continue to your barangay portal.
+        </p>
+
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: "20px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "600",
+                color: "#1B5E20",
+              }}
+            >
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: "12px",
+                border: "1px solid #ccc",
+                fontSize: "16px",
+                boxSizing: "border-box",
+              }}
+              required
+            />
+          </div>
+
+          <div style={{ marginBottom: "25px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "600",
+                color: "#1B5E20",
+              }}
+            >
+              Password
+            </label>
+
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: "12px",
+                border: "1px solid #ccc",
+                fontSize: "16px",
+                boxSizing: "border-box",
+              }}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "15px",
+              backgroundColor: "#1B5E20",
+              color: "white",
+              border: "none",
+              borderRadius: "12px",
+              fontSize: "17px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Login
+          </button>
+        </form>
+
+        <p
+          style={{
+            marginTop: "25px",
+            textAlign: "center",
+            color: "gray",
+            fontSize: "14px",
+          }}
+        >
+          Powered by idamag.mo AI Assistance
+        </p>
+      </div>
+    </div>
+  </div>
+);
 }
