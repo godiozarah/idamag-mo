@@ -1161,18 +1161,6 @@ setAnalyticsViews(views);
   )}
 
 </div>
-      <div className="analytics-actions">
-
-        <button
-          className="close-modal-btn"
-          onClick={() =>
-            setAnalyticsAnnouncement(null)
-          }
-        >
-          Close
-        </button>
-
-      </div>
 
     </div>
   </div>

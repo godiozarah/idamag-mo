@@ -247,7 +247,6 @@ ${currentMessage}
         backgroundColor: "#f5f5f5"
       }}
     >
-
       {/* CHAT AREA */}
       <div
         style={{
@@ -257,29 +256,70 @@ ${currentMessage}
         }}
       >
 
-        {/* WELCOME */}
         {chat.length === 0 && (
 
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: "80px",
-              color: "#666"
-            }}
-          >
+  <div
+    style={{
+      marginTop: "40px",
+      padding: "25px",
+      maxWidth: "500px",
+      marginInline: "auto",
+      background: "white",
+      borderRadius: "18px",
+      boxShadow: "0 4px 12px rgba(0,0,0,.08)"
+    }}
+  >
 
-            <h2>
-              Barangay AI Assistant
-            </h2>
+    <h2
+      style={{
+        color: "#1B5E20",
+        marginBottom: "5px"
+      }}
+    >
+      👋 Hi! I'm Barangay AI
+    </h2>
 
-            <p>
-              Ask anything about
-              Barangay Ucab.
-            </p>
+    <p
+      style={{
+        color: "#777",
+        marginBottom: "20px"
+      }}
+    >
+      Your Official AI Assistant for Barangay UCAB
+    </p>
 
-          </div>
+    <p style={{marginBottom:"12px"}}>
+      I can help you with:
+    </p>
 
-        )}
+    <ul
+      style={{
+        color:"#444",
+        lineHeight:"1.8",
+        paddingLeft:"20px"
+      }}
+    >
+      <li>Barangay Announcements</li>
+      <li>Certificates & Requirements</li>
+      <li>Barangay Services</li>
+      <li>Office Hours</li>
+      <li>Community Concerns</li>
+      <li>General Barangay Questions</li>
+    </ul>
+
+    <p
+      style={{
+        marginTop:"18px",
+        color:"#2E7D32",
+        fontWeight:"bold"
+      }}
+    >
+      How can I assist you today?
+    </p>
+
+  </div>
+
+)}
 
         {/* CHAT MESSAGES */}
         {chat.map((msg, index) => (
@@ -381,7 +421,7 @@ ${currentMessage}
 
         <input
           type="text"
-          placeholder="Type your message..."
+          placeholder="Ask Barangay AI..."
           value={message}
           onChange={(e) =>
             setMessage(

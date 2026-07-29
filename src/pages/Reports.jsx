@@ -63,7 +63,6 @@ export default function Reports() {
   // ADMIN EMAIL
   const adminEmail = "admin@ucab.com";
 
-
  // ==========================
 // LOAD REPORTS
 // ==========================
@@ -702,10 +701,6 @@ await addDoc(collection(db, "reports"), {
 
         </div>
 
-
-
-
-
         <div className="col-12 col-md-3">
 
 
@@ -722,11 +717,7 @@ await addDoc(collection(db, "reports"), {
                   className="text-primary fs-4"
                 />
 
-
               </div>
-
-
-
               <div>
 
 
@@ -754,11 +745,6 @@ await addDoc(collection(db, "reports"), {
 
 
         </div>
-
-
-
-
-
         <div className="col-12 col-md-3">
 
 
@@ -777,45 +763,22 @@ await addDoc(collection(db, "reports"), {
 
 
               </div>
-
-
-
               <div>
-
-
                 <h6 className="text-muted mb-1">
 
                   Resolved
-
                 </h6>
-
 
                 <h3 className="fw-bold mb-0">
 
                   {resolvedReports}
 
                 </h3>
-
-
               </div>
-
-
             </div>
-
-
           </div>
-
-
         </div>
-
-
-
       </div>
-
-
-
-
-
 {/* ==========================
     SUBMIT REPORT FORM
 ========================== */}
@@ -1025,16 +988,9 @@ await addDoc(collection(db, "reports"), {
                   }
 
                 />
-
-
               </div>
 
-
             </div>
-
-
-
-
 
             <div className="col-12 col-md-4">
 
@@ -1081,181 +1037,85 @@ await addDoc(collection(db, "reports"), {
 
                 </option>
 
-
                 <option value="Declined">
 
                   Declined
 
                 </option>
 
-
               </select>
-
 
             </div>
 
-
-
           </div>
-
-
         </div>
 
-
       </div>
-
-
-
-
-
 
       {/* ==========================
           LOADING
       ========================== */}
 
-
-
       {loading && (
 
-
         <div className="text-center py-5">
-
-
           <div
-
             className="spinner-border text-success"
-
             role="status"
 
           >
-
           </div>
-
-
           <p className="mt-3 text-muted">
-
             Loading reports...
-
           </p>
-
-
         </div>
 
-
       )}
-
-
-
-
-
-
 
       {/* ==========================
           EMPTY STATE
       ========================== */}
-
-
-
       {!loading &&
         filteredReports.length === 0 && (
-
-
         <div className="card shadow-sm border-0 text-center p-5">
-
-
           <h4 className="text-success">
 
             No Reports Found
 
           </h4>
-
-
           <p className="text-muted mb-0">
 
             There are no submitted concerns matching your search.
-
           </p>
-
-
         </div>
-
-
       )}
-
-
-
-
-
-
-
-
       {/* ==========================
           REPORT CARDS
       ========================== */}
-
-
-
       <div className="row g-4">
-
-
-
         {filteredReports.map((report)=>(
-
-
-
           <div
-
             className="col-12"
-
             key={report.id}
-
           >
-
-
 
             <div className="card shadow-sm border-0">
 
-
-
               <div className="card-body p-4">
-
-
-
-
-
                 {/* HEADER */}
 
-
-
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
-
-
-
                   <div>
-
-
                     <h4 className="fw-bold text-success mb-1">
 
                       {report.title || "Untitled Report"}
-
                     </h4>
-
-
-
                     <span className="badge bg-secondary">
 
                       {report.category}
 
                     </span>
-
-
-
                   </div>
-
-
-
-
-
                   <span
 
                     className={`badge bg-${getStatusClass(
@@ -1263,24 +1123,12 @@ await addDoc(collection(db, "reports"), {
                     )} fs-6 px-3 py-2`}
 
                   >
-
                     {report.status}
-
 
                   </span>
 
-
-
                 </div>
-
-
-
-
-
-
-
                <div className="d-flex align-items-center mb-3">
-
   <img
     src={`/${userProfiles[report.userId]?.avatar || "avatar1.png"}`}
     alt="Avatar"
@@ -1295,65 +1143,40 @@ await addDoc(collection(db, "reports"), {
   />
 
   <div>
-
     <div className="fw-bold">
       Resident #{String(report.residentNumber || 0).padStart(4, "0")}
     </div>
 
-    <small className="text-muted">
-      {report.reporterEmail}
-    </small>
-
-    <br />
+    {auth.currentUser?.email === adminEmail && (
+      <>
+        <small className="text-muted">
+          {report.reporterEmail}
+        </small>
+        <br />
+      </>
+    )}
 
     <small className="text-muted">
       {formatDate(report.createdAt)}
     </small>
-
   </div>
-
 </div>
-
-
-
-
-
-
-
                 {/* CONCERN */}
-
-
-
                 <div className="bg-light rounded p-3 mb-4">
-
-
                   <h6 className="fw-bold">
-
                     Concern Description
-
                   </h6>
-
-
                   <p className="mb-0 text-secondary">
-
-
                     {report.concern}
-
-
                   </p>
-
-
-
                 </div>
 
 {report.imageUrl && (
 
 <div className="mb-4">
-
 <h6 className="fw-bold">
 Attached Image
 </h6>
-
 
 <img
 
@@ -1362,183 +1185,73 @@ src={report.imageUrl}
 alt="Report"
 
 className="img-fluid rounded shadow-sm"
-
 style={{
 maxHeight:"300px"
 }}
 
 />
-
 </div>
-
 )}
-
-
-
-
-
                 {/* PROGRESS BAR */}
-
-
-
                 <div className="mb-4">
-
 
                   <div className="d-flex justify-content-between mb-2">
 
-
                     <small className="fw-semibold">
-
                       Report Progress
-
                     </small>
-
-
-
                     <small>
-
                       {getProgressValue(
                         report.status
                       )}%
-
                     </small>
-
-
-
                   </div>
-
-
-
-
-
                   <div className="progress">
-
-
                     <div
-
                       className={`progress-bar bg-${getStatusClass(
                         report.status
                       )}`}
-
                       role="progressbar"
-
                       style={{
-
                         width:
                           `${getProgressValue(
                             report.status
                           )}%`
-
                       }}
-
                     >
-
-
                     </div>
-
-
                   </div>
-
-
                 </div>
-
-
-
-
-
-
-
                 {/* BARANGAY RESPONSE */}
-
-
-
                 {report.adminSolution && (
-
-
                   <div className="alert alert-success">
-
-
                     <h5 className="fw-bold">
-
                       Barangay Response
-
                     </h5>
-
-
-
                     <p className="mb-0">
-
-
                       {report.adminSolution}
-
-
                     </p>
-
-
-
                   </div>
-
-
                 )}
-
-
-
-
-
-
                 {/* DELETE BUTTON ADMIN ONLY */}
-
-
-
                 {auth.currentUser?.email === adminEmail && (
-
-
-
                   <button
-
                     className="btn btn-danger"
-
                     onClick={()=>
                       deleteReport(
                         report.id
                       )
                     }
-
                   >
-
-
                     <FaTrash className="me-2"/>
-
-
                     Delete Report
-
-
-
                   </button>
-
-
-
                 )}
-
-
-
-
-
-
-
               </div>
-
-
             </div>
-
-
           </div>
         ))}
-
       </div>
-
     </div>
-
   );
-
 }
