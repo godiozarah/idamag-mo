@@ -49,7 +49,7 @@ export default function AdminReports() {
         const statusMap = {};
 
         allReports.forEach((report) => {
-          statusMap[report.id] = report.status || "Pending";
+          statusMap[report.id] = report.status === "Resolved" ? "Resolved" : "Pending";
         });
 
         setStatuses(statusMap);
@@ -78,10 +78,7 @@ export default function AdminReports() {
   // REPORT FILTERS
   // ==========================
   const pendingReports = reports.filter(
-    (report) =>
-      report.status === "Pending" ||
-      report.status === "In Progress" ||
-      !report.status
+    (report) => report.status !== "Resolved"
   );
 
   const resolvedReports = reports.filter(
@@ -104,9 +101,19 @@ export default function AdminReports() {
   // STATUS COUNT
   // ==========================
   const getStatusCount = (categoryReports, status) => {
-    return categoryReports.filter(
-      (report) => (report.status || "Pending") === status
-    ).length;
+    if (status === "Pending") {
+      return categoryReports.filter(
+        (report) => report.status !== "Resolved"
+      ).length;
+    }
+
+    if (status === "Resolved") {
+      return categoryReports.filter(
+        (report) => report.status === "Resolved"
+      ).length;
+    }
+
+    return 0;
   };
 
   // ==========================
@@ -208,13 +215,6 @@ export default function AdminReports() {
       };
     }
 
-    if (status === "In Progress") {
-      return {
-        background: "#E3F2FD",
-        color: "#1565C0",
-        icon: "↻",
-      };
-    }
 
     return {
       background: "#FFF8E1",
@@ -227,11 +227,11 @@ export default function AdminReports() {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #f4f8f4 0%, #eef7ef 50%, #e8f5e9 100%)",
-        padding: "35px 45px 60px",
-        fontFamily: "'Segoe UI', sans-serif",
+        background: "#F6F8F6",
+        padding: "clamp(20px, 3vw, 42px)",
+        fontFamily: "Inter, 'Segoe UI', sans-serif",
         color: "#263238",
+        boxSizing: "border-box",
       }}
     >
       {/* ==========================
@@ -270,9 +270,10 @@ export default function AdminReports() {
             style={{
               margin: 0,
               color: "#145A1A",
-              fontSize: "38px",
+              fontSize: "clamp(30px, 3vw, 42px)",
               fontWeight: "800",
-              letterSpacing: "-0.5px",
+              letterSpacing: "-1.2px",
+              lineHeight: 1.12,
             }}
           >
             Community Reports
@@ -298,6 +299,7 @@ export default function AdminReports() {
             boxShadow: "0 5px 18px rgba(27,94,32,0.08)",
             border: "1px solid #E2ECE3",
             minWidth: "170px",
+            boxSizing: "border-box",
           }}
         >
           <div
@@ -331,9 +333,9 @@ export default function AdminReports() {
         style={{
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "18px",
-          marginBottom: "35px",
+            "repeat(auto-fit, minmax(min(100%, 245px), 1fr))",
+          gap: "20px",
+          marginBottom: "38px",
         }}
       >
         {Object.entries(groupedReports).map(
@@ -341,11 +343,6 @@ export default function AdminReports() {
             const pendingCount = getStatusCount(
               categoryReports,
               "Pending"
-            );
-
-            const progressCount = getStatusCount(
-              categoryReports,
-              "In Progress"
             );
 
             const resolvedCount = getStatusCount(
@@ -366,15 +363,17 @@ export default function AdminReports() {
                 }
                 style={{
                   background: "#fff",
-                  borderRadius: "18px",
-                  padding: "21px",
+                  borderRadius: "20px",
+                  padding: "24px",
+                  minHeight: "190px",
+                  boxSizing: "border-box",
                   cursor: "pointer",
                   border: isSelected
                     ? "2px solid #2E7D32"
                     : "1px solid #E1E9E2",
                   boxShadow: isSelected
                     ? "0 8px 24px rgba(46,125,50,0.16)"
-                    : "0 5px 18px rgba(0,0,0,0.06)",
+                    : "0 8px 26px rgba(20,60,25,0.045)",
                   transition: "all .2s ease",
                   transform: isSelected
                     ? "translateY(-2px)"
@@ -431,43 +430,32 @@ export default function AdminReports() {
                 <div
                   style={{
                     display: "flex",
-                    gap: "6px",
+                    gap: "8px",
                     flexWrap: "wrap",
+                    marginTop: "4px",
                   }}
                 >
                   <span
                     style={{
                       background: "#FFF8E1",
                       color: "#F57F17",
-                      padding: "5px 8px",
-                      borderRadius: "7px",
-                      fontSize: "10px",
+                      padding: "7px 10px",
+                      borderRadius: "9px",
+                      fontSize: "11px",
                       fontWeight: "700",
                     }}
                   >
                     {pendingCount} Pending
                   </span>
 
-                  <span
-                    style={{
-                      background: "#E3F2FD",
-                      color: "#1565C0",
-                      padding: "5px 8px",
-                      borderRadius: "7px",
-                      fontSize: "10px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    {progressCount} In Progress
-                  </span>
 
                   <span
                     style={{
                       background: "#E8F5E9",
                       color: "#2E7D32",
-                      padding: "5px 8px",
-                      borderRadius: "7px",
-                      fontSize: "10px",
+                      padding: "7px 10px",
+                      borderRadius: "9px",
+                      fontSize: "11px",
                       fontWeight: "700",
                     }}
                   >
@@ -575,7 +563,7 @@ export default function AdminReports() {
               fontSize: "13px",
             }}
           >
-            Pending and in-progress resident concerns
+            Resident concerns awaiting action
           </p>
         </div>
 
@@ -638,7 +626,7 @@ export default function AdminReports() {
               fontSize: "14px",
             }}
           >
-            There are currently no pending or in-progress reports.
+            There are currently no pending reports.
           </p>
         </div>
       ) : (
@@ -822,15 +810,12 @@ export default function AdminReports() {
                     }}
                   >
                     <option value="Pending">
-                      🟡 Pending
+                      Pending
                     </option>
 
-                    <option value="In Progress">
-                      🔵 In Progress
-                    </option>
 
                     <option value="Resolved">
-                      🟢 Resolved
+                      Resolved
                     </option>
                   </select>
                 </div>
